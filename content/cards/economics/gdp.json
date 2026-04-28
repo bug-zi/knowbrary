@@ -1,0 +1,21 @@
+{
+  "id": "econ-003",
+  "slug": "gdp",
+  "title": "GDP",
+  "oneLiner": "衡量一个国家经济实力的「体温计」——GDP 是一国在一定时期内生产的所有最终商品和服务的总价值。",
+  "category": "economics",
+  "tags": ["宏观经济", "国民经济", "统计指标"],
+  "difficulty": "beginner",
+  "cardType": "concept",
+  "content": "## 什么是 GDP？\n\nGDP（Gross Domestic Product，国内生产总值）是一个国家在特定时期内生产的所有最终商品和服务的市场价值总和。\n\n### GDP 的三个视角\n\n1. **生产法**：各行各业生产了多少价值\n2. **收入法**：大家一共赚了多少钱\n3. **支出法**：大家一共花了多少钱（最常用）\n\n### 支出法公式\n\n**GDP = 消费 + 投资 + 政府支出 + 净出口**\n\n即 GDP = C + I + G + (X - M)\n\n### GDP 的局限\n\n- 不计算家务劳动、志愿服务\n- 不反映收入分配是否公平\n- 不反映环境代价\n- 不反映人民幸福感\n\n所以 GDP 高不代表一切都好，它只是经济「体温计」之一。",
+  "keyData": [
+    { "label": "中国2024年GDP", "value": "~126万亿元", "description": "世界第二大经济体" },
+    { "label": "全球GDP", "value": "~105万亿美元", "description": "2024年估计值" }
+  ],
+  "references": [
+    { "id": 1, "title": "《经济学原理》", "author": "曼昆" }
+  ],
+  "relatedCards": ["econ-001", "econ-002"],
+  "createdAt": "2026-04-27",
+  "updatedAt": "2026-04-27"
+}

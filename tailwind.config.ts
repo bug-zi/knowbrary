@@ -1,0 +1,68 @@
+import type { Config } from 'tailwindcss'
+
+export default {
+  darkMode: 'class',
+  content: [
+    './components/**/*.{vue,ts}',
+    './pages/**/*.vue',
+    './app.vue',
+    './error.vue',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        macaron: {
+          bg: 'var(--macaron-bg)',
+          card: 'var(--macaron-card)',
+          border: 'var(--macaron-border)',
+          text: 'var(--macaron-text)',
+          'text-secondary': 'var(--macaron-text-secondary)',
+          cta: 'var(--macaron-cta)',
+          'cta-hover': 'var(--macaron-cta-hover)',
+          muted: 'var(--macaron-muted)',
+          'muted-light': 'var(--macaron-muted-light)',
+          'progress-track': 'var(--macaron-progress-track)',
+          'surface-alt': 'var(--macaron-surface-alt)',
+          'surface-hover-alt': 'var(--macaron-surface-hover-alt)',
+          'graph-bg': 'var(--macaron-graph-bg)',
+          'svg-guide': 'var(--macaron-svg-guide)',
+          'input-bg': 'var(--macaron-input-bg)',
+          'hover-bg': 'var(--macaron-hover-bg)',
+        },
+        category: {
+          economics: '#FFB3BA',
+          psychology: '#BAFFC9',
+          law: '#BAE1FF',
+          medicine: '#FFFFBA',
+          astronomy: '#E8BAFF',
+          geography: '#BAFFEE',
+          politics: '#FFD4BA',
+          biology: '#C9FFBA',
+          philosophy: '#D4BAFF',
+          literature: '#FFDAB9',
+          art: '#FFB3DE',
+          music: '#B3FFF0',
+          mathematics: '#C9D4FF',
+          ecology: '#BAFFD4',
+          animals: '#FFDFBA',
+          plants: '#D4FFBA',
+          food: '#FFE4BA',
+          sports: '#FFB3B3',
+          military: '#D4D4BA',
+          education: '#BAD4FF',
+          communication: '#FFBAD4',
+          'scientific-method': '#B4D4FF',
+          'data-thinking': '#D4BAE8',
+        },
+      },
+      borderRadius: {
+        'card': '16px',
+      },
+      boxShadow: {
+        'card': '0 2px 12px rgba(0, 0, 0, 0.06)',
+        'card-hover': '0 4px 20px rgba(0, 0, 0, 0.1)',
+      },
+    },
+  },
+  plugins: [],
+} satisfies Config

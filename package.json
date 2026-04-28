@@ -1,0 +1,32 @@
+{
+  "name": "wanxiang-institute",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/icon": "^1.5.2",
+    "@supabase/supabase-js": "^2.104.1",
+    "d3-force": "^3.0.0",
+    "d3-selection": "^3.0.0",
+    "d3-zoom": "^3.0.0",
+    "nuxt": "^3.16",
+    "vue": "^3.5",
+    "vue-router": "^4.5"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.104",
+    "@nuxtjs/color-mode": "^3.5",
+    "@nuxtjs/tailwindcss": "^6.13",
+    "@types/d3-force": "^3.0.10",
+    "@types/d3-selection": "^3.0.11",
+    "@types/d3-zoom": "^3.0.8",
+    "minisearch": "^7.1",
+    "typescript": "^5.7"
+  }
+}

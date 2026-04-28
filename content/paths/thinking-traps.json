@@ -1,0 +1,21 @@
+{
+  "id": "path-thinking-traps",
+  "slug": "thinking-traps",
+  "title": "思维陷阱自查",
+  "description": "认识认知偏差，做出更理性的决策。了解大脑的「省电模式」如何欺骗你。",
+  "category": "心理学",
+  "categorySlug": "psychology",
+  "icon": "lucide:brain",
+  "color": "#BAFFC9",
+  "difficulty": "beginner",
+  "estimatedTime": "20 分钟",
+  "nodes": [
+    { "id": "n1", "cardId": "psych-001", "type": "required", "position": { "x": 200, "y": 40 } },
+    { "id": "n2", "cardId": "psych-002", "type": "required", "position": { "x": 200, "y": 160 } }
+  ],
+  "edges": [
+    { "from": "n1", "to": "n2", "type": "prerequisite" }
+  ],
+  "author": "万象编辑部",
+  "tags": ["心理学", "认知偏差", "决策"]
+}

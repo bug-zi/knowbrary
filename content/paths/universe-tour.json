@@ -1,0 +1,21 @@
+{
+  "id": "path-universe",
+  "slug": "universe-tour",
+  "title": "宇宙漫游指南",
+  "description": "从大爆炸到黑洞，探索宇宙的壮阔历史。用最简单的语言理解最深邃的宇宙奥秘。",
+  "category": "天文学",
+  "categorySlug": "astronomy",
+  "icon": "lucide:telescope",
+  "color": "#E8BAFF",
+  "difficulty": "beginner",
+  "estimatedTime": "20 分钟",
+  "nodes": [
+    { "id": "n1", "cardId": "astro-002", "type": "required", "position": { "x": 200, "y": 40 } },
+    { "id": "n2", "cardId": "astro-001", "type": "required", "position": { "x": 200, "y": 160 } }
+  ],
+  "edges": [
+    { "from": "n1", "to": "n2", "type": "prerequisite" }
+  ],
+  "author": "万象编辑部",
+  "tags": ["天文学", "宇宙", "入门"]
+}

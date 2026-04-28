@@ -1,0 +1,23 @@
+{
+  "id": "path-econ-intro",
+  "slug": "economics-intro",
+  "title": "经济学入门",
+  "description": "从供需法则开始，理解市场运作的底层逻辑。掌握 GDP、通胀等核心概念，学会用经济学思维看世界。",
+  "category": "经济学",
+  "categorySlug": "economics",
+  "icon": "lucide:coins",
+  "color": "#FFB3BA",
+  "difficulty": "beginner",
+  "estimatedTime": "30 分钟",
+  "nodes": [
+    { "id": "n1", "cardId": "econ-001", "type": "required", "position": { "x": 200, "y": 40 } },
+    { "id": "n2", "cardId": "econ-002", "type": "required", "position": { "x": 100, "y": 140 } },
+    { "id": "n3", "cardId": "econ-003", "type": "required", "position": { "x": 300, "y": 140 } }
+  ],
+  "edges": [
+    { "from": "n1", "to": "n2", "type": "prerequisite" },
+    { "from": "n1", "to": "n3", "type": "prerequisite" }
+  ],
+  "author": "万象编辑部",
+  "tags": ["经济学", "入门", "宏观"]
+}

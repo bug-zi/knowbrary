@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* === Light Theme (default) === */
+  :root {
+    --macaron-bg: #FAF3EB;
+    --macaron-card: #FFFFFF;
+    --macaron-border: #E4D5C4;
+    --macaron-text: #3E2723;
+    --macaron-text-secondary: #795548;
+    --macaron-cta: #6F4E37;
+    --macaron-cta-hover: #5D4037;
+    --macaron-surface: #FFFFFF;
+    --macaron-surface-hover: rgba(255, 255, 255, 0.6);
+    --macaron-overlay: rgba(250, 243, 235, 0.95);
+    --macaron-gradient-from: #F8F3E9;
+    --macaron-gradient-via: #F0E8D8;
+    --macaron-gradient-to: #F5EFE6;
+    --macaron-detail-card-bg: #FFFFFF;
+    --macaron-detail-card-border: rgba(232, 222, 208, 0.6);
+    --macaron-detail-card-shadow: rgba(93, 64, 55, 0.06);
+    --macaron-prose-body: #5D4037;
+    --macaron-prose-heading: #3E2723;
+    --macaron-prose-link: #8D6E63;
+    --macaron-badge-bg: #F5EFE6;
+    --macaron-badge-text: #8D6E63;
+    --macaron-tag-bg: #FDFBF7;
+    --macaron-tag-text: #A1887F;
+    --macaron-danger-hover: #FEF2F2;
+    --macaron-muted: #BCAAA4;
+    --macaron-muted-light: #D7CCC8;
+    --macaron-progress-track: #E8DED0;
+    --macaron-surface-alt: #FDFBF7;
+    --macaron-surface-hover-alt: #F5EFE6;
+    --macaron-graph-bg: #FFF8F0;
+    --macaron-svg-guide: #e5e7eb;
+    --macaron-input-bg: #FFFFFF;
+    --macaron-hover-bg: #F5EFE6;
+  }
+
+  /* === Dark Theme === */
+  .dark {
+    --macaron-bg: #1A1512;
+    --macaron-card: #2A2320;
+    --macaron-border: #3D3530;
+    --macaron-text: #E8DDD0;
+    --macaron-text-secondary: #A89888;
+    --macaron-cta: #D4A574;
+    --macaron-cta-hover: #E0B888;
+    --macaron-surface: #2A2320;
+    --macaron-surface-hover: rgba(42, 35, 32, 0.6);
+    --macaron-overlay: rgba(26, 21, 18, 0.95);
+    --macaron-gradient-from: #1A1512;
+    --macaron-gradient-via: #221C18;
+    --macaron-gradient-to: #1E1915;
+    --macaron-detail-card-bg: #2A2320;
+    --macaron-detail-card-border: rgba(61, 53, 48, 0.8);
+    --macaron-detail-card-shadow: rgba(0, 0, 0, 0.2);
+    --macaron-prose-body: #C8B8A8;
+    --macaron-prose-heading: #E8DDD0;
+    --macaron-prose-link: #D4A574;
+    --macaron-badge-bg: #3D3530;
+    --macaron-badge-text: #C8B8A8;
+    --macaron-tag-bg: #2A2320;
+    --macaron-tag-text: #A89888;
+    --macaron-danger-hover: #2A1515;
+    --macaron-muted: #8D7D72;
+    --macaron-muted-light: #5D4F47;
+    --macaron-progress-track: #3D3530;
+    --macaron-surface-alt: #221C18;
+    --macaron-surface-hover-alt: #3D3530;
+    --macaron-graph-bg: #1A1512;
+    --macaron-svg-guide: #3D3530;
+    --macaron-input-bg: #2A2320;
+    --macaron-hover-bg: #3D3530;
+  }
+
+  body {
+    @apply bg-macaron-bg text-macaron-text;
+    font-family: 'Inter', 'Source Han Sans', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .card-base {
+    @apply rounded-2xl p-6 transition-all duration-200 border;
+    background: var(--macaron-card);
+    border-color: var(--macaron-border);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  .card-base:hover {
+    @apply -translate-y-0.5 shadow-md;
+  }
+
+  .badge-beginner {
+    @apply text-xs px-2 py-0.5 rounded-full;
+    background: #FDE68A33;
+    color: #D97706;
+  }
+  .dark .badge-beginner {
+    background: #92400E44;
+    color: #FCD34D;
+  }
+
+  .badge-intermediate {
+    @apply text-xs px-2 py-0.5 rounded-full;
+    background: #BFDBFE44;
+    color: #2563EB;
+  }
+  .dark .badge-intermediate {
+    background: #1E40AF44;
+    color: #93C5FD;
+  }
+
+  .badge-advanced {
+    @apply text-xs px-2 py-0.5 rounded-full;
+    background: #E9D5FF44;
+    color: #7C3AED;
+  }
+  .dark .badge-advanced {
+    background: #5B21B644;
+    color: #C4B5FD;
+  }
+
+  /* === Card Detail Page === */
+  .card-detail-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .card-detail-card {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 1rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+  }
+
+  .dark .card-detail-card {
+    background: rgba(42, 35, 32, 0.55);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), 0 1px 4px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .card-detail-card .prose {
+    --tw-prose-body: var(--macaron-prose-body);
+    --tw-prose-headings: var(--macaron-prose-heading);
+    --tw-prose-bold: var(--macaron-prose-heading);
+    --tw-prose-links: var(--macaron-prose-link);
+    color: var(--macaron-prose-body);
+  }
+
+  .card-warm-badge {
+    @apply text-xs px-2.5 py-1 rounded-full font-medium;
+    background: var(--macaron-badge-bg);
+    color: var(--macaron-badge-text);
+  }
+
+  .card-warm-tag {
+    @apply text-xs px-2.5 py-1 rounded-full;
+    background: var(--macaron-tag-bg);
+    color: var(--macaron-tag-text);
+  }
+
+  .card-slide-inner {
+    min-height: 65vh;
+    min-height: 65dvh;
+  }
+
+  @media (min-width: 768px) {
+    .card-slide-inner {
+      min-height: 55vh;
+    }
+  }
+}

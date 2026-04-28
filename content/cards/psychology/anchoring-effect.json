@@ -1,0 +1,21 @@
+{
+  "id": "psych-002",
+  "slug": "anchoring-effect",
+  "title": "锚定效应",
+  "oneLiner": "第一个数字会「锚住」你的判断——即使它和当前决策毫无关系。",
+  "category": "psychology",
+  "tags": ["认知偏差", "决策", "谈判"],
+  "difficulty": "beginner",
+  "cardType": "concept",
+  "content": "## 什么是锚定效应？\n\n锚定效应是指人们在做决策时，会过度依赖最先获得的信息（即「锚」），后续的判断都会围绕这个锚来调整。\n\n### 经典实验\n\nTversky 和 Kahneman 转过一个幸运轮盘（明显是随机的），然后问受试者「联合国中非洲国家的比例是多少？」\n\n结果：轮盘停在 10 的人，平均猜 25%；轮盘停在 65 的人，平均猜 45%。一个随机数字竟然影响了判断。\n\n### 商业应用\n\n- **原价 999，现价 399**：999 就是锚，让你觉得 399 很便宜\n- **工资谈判**：先开口的人设定了锚点\n- **菜单设计**：放一个超贵的菜让其他菜看起来合理",
+  "keyData": [
+    { "label": "发现者", "value": "Tversky & Kahneman", "description": "1974年提出" },
+    { "label": "效应强度", "value": "显著", "description": "即使知道锚的存在也很难完全避免" }
+  ],
+  "references": [
+    { "id": 1, "title": "《思考，快与慢》", "author": "丹尼尔·卡尼曼" }
+  ],
+  "relatedCards": ["psych-001", "psych-003"],
+  "createdAt": "2026-04-27",
+  "updatedAt": "2026-04-27"
+}
