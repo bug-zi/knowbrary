@@ -11,6 +11,7 @@
     --macaron-text: #3E2723;
     --macaron-text-secondary: #795548;
     --macaron-cta: #6F4E37;
+    --macaron-cta-light: #C4A882;
     --macaron-cta-hover: #5D4037;
     --macaron-surface: #FFFFFF;
     --macaron-surface-hover: rgba(255, 255, 255, 0.6);
@@ -48,6 +49,7 @@
     --macaron-text: #E8DDD0;
     --macaron-text-secondary: #A89888;
     --macaron-cta: #D4A574;
+    --macaron-cta-light: #E8D5C0;
     --macaron-cta-hover: #E0B888;
     --macaron-surface: #2A2320;
     --macaron-surface-hover: rgba(42, 35, 32, 0.6);
@@ -127,8 +129,18 @@
 
   /* === Card Detail Page === */
   .card-detail-page {
-    min-height: 100vh;
-    min-height: 100dvh;
+    position: fixed;
+    top: 3.5rem;
+    left: 0;
+    right: 0;
+    bottom: 3.5rem;
+    height: auto;
+  }
+
+  @media (min-width: 768px) {
+    .card-detail-page {
+      bottom: 0;
+    }
   }
 
   .card-detail-card {
@@ -166,14 +178,4 @@
     color: var(--macaron-tag-text);
   }
 
-  .card-slide-inner {
-    min-height: 65vh;
-    min-height: 65dvh;
-  }
-
-  @media (min-width: 768px) {
-    .card-slide-inner {
-      min-height: 55vh;
-    }
-  }
 }

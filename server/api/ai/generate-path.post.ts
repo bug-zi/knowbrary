@@ -12,12 +12,13 @@ const PROVIDER_URLS: Record<AIProvider, string> = {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { provider, apiKey, model, category, existingPaths } = body as {
+  const { provider, apiKey, model, category, existingPaths, existingCards } = body as {
     provider: AIProvider
     apiKey: string
     model: string
     category: Category
     existingPaths: string[]
+    existingCards: {id: string, title: string, oneLiner: string}[]
   }
 
   if (!provider || !apiKey || !model || !category) {
@@ -29,7 +30,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: `Invalid provider: ${provider}` })
   }
 
-  const prompt = buildPathPrompt(category, existingPaths || [])
+  const prompt = buildPathPrompt(category, existingPaths || [], existingCards || [])
 
   const resp = await fetch(url, {
     method: 'POST',
@@ -44,7 +45,7 @@ export default defineEventHandler(async (event) => {
         { role: 'user', content: prompt },
       ],
       temperature: 0.8,
-      max_tokens: 4000,
+      max_tokens: 8000,
     }),
   })
 

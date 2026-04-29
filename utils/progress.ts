@@ -26,25 +26,24 @@ export function getNodeState(node: PathNode, path: LearningPath): 'completed' | 
 
   if (learned.includes(node.cardId)) return 'completed'
 
-  // Check if all prerequisite nodes are completed
-  const prereqs = path.edges.filter(e => e.to === node.id && e.type === 'prerequisite')
-  const allPrereqsDone = prereqs.every(e => {
-    const prereqNode = path.nodes.find(n => n.id === e.from)
-    return prereqNode && learned.includes(prereqNode.cardId)
-  })
+  // All incoming edges (regardless of type) are treated as prerequisites
+  const parentEdges = path.edges.filter(e => e.to === node.id)
 
   // Root nodes (no incoming edges) are always available
-  const hasIncoming = path.edges.some(e => e.to === node.id && e.type === 'prerequisite')
-  if (!hasIncoming) return 'available'
+  if (parentEdges.length === 0) return 'available'
 
-  return allPrereqsDone ? 'available' : 'locked'
+  const allParentsDone = parentEdges.every(e => {
+    const parentNode = path.nodes.find(n => n.id === e.from)
+    return parentNode && learned.includes(parentNode.cardId)
+  })
+
+  return allParentsDone ? 'available' : 'locked'
 }
 
 export function getPathProgress(path: LearningPath): { completed: number; total: number; percentage: number } {
   const learned = getLearnedCardIds()
-  const requiredNodes = path.nodes.filter(n => n.type === 'required')
-  const completed = requiredNodes.filter(n => learned.includes(n.cardId)).length
-  const total = requiredNodes.length
+  const total = path.nodes.length
+  const completed = path.nodes.filter(n => learned.includes(n.cardId)).length
   return { completed, total, percentage: total > 0 ? Math.round((completed / total) * 100) : 0 }
 }
 

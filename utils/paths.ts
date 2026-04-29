@@ -97,12 +97,12 @@ export async function insertPath(path: LearningPath): Promise<{ ok: boolean; err
       title: n.cardTitle || n.title || '未命名概念',
       one_liner: n.cardOneLiner || n.oneLiner || '',
       category_id: categorySlug,
-      tags: p.tags || [],
-      difficulty: p.difficulty || 'beginner',
-      card_type: 'concept',
-      content: n.cardTitle ? `# ${n.cardTitle}\n\n${n.cardOneLiner || ''}` : '',
-      key_data: [],
-      references: [],
+      tags: n.cardTags || n.tags || p.tags || [],
+      difficulty: n.cardDifficulty || p.difficulty || 'beginner',
+      card_type: n.cardType || 'concept',
+      content: n.cardContent || (n.cardTitle ? `# ${n.cardTitle}\n\n${n.cardOneLiner || ''}` : ''),
+      key_data: n.cardKeyData || [],
+      references: n.cardReferences || [],
       related_card_ids: [] as string[],
     })
     if (cardErr) {

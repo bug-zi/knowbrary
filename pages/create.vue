@@ -131,7 +131,7 @@
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-lg">{{ generatedPath.icon }}</span>
+          <Icon :name="generatedPath.icon" class="text-lg" />
           <span :class="`badge-${generatedPath.difficulty}`">
             {{ generatedPath.difficulty === 'beginner' ? '入门' : generatedPath.difficulty === 'intermediate' ? '进阶' : '专业' }}
           </span>
@@ -150,7 +150,11 @@
               :class="node.type === 'required' ? 'bg-macaron-cta' : node.type === 'optional' ? 'bg-blue-400' : 'bg-yellow-400'"
             />
             <span class="font-medium text-macaron-text">{{ node.cardTitle }}</span>
-            <span class="text-xs text-macaron-text-secondary">({{ node.type }})</span>
+            <span class="text-xs text-macaron-text-secondary">
+              ({{ node.type === 'required' ? '必修' : node.type === 'optional' ? '选修' : '加分' }})
+            </span>
+            <span v-if="node.cardId" class="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700">已有卡片</span>
+            <span v-else class="text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">新建卡片</span>
           </div>
         </div>
       </div>
@@ -291,6 +295,11 @@ async function startGenerate() {
 
       generatedCard.value = (res as any).card
     } else {
+      const allCards = await getAllCards()
+      const categoryCards = allCards
+        .filter(c => c.category === selectedCategory.value)
+        .map(c => ({ id: c.id, title: c.title, oneLiner: c.oneLiner }))
+
       const res = await $fetch('/api/ai/generate-path', {
         method: 'POST',
         body: {
@@ -299,6 +308,7 @@ async function startGenerate() {
           model: activeConfig.value.model,
           category: selectedCategory.value,
           existingPaths: [],
+          existingCards: categoryCards,
         },
       })
 

@@ -123,7 +123,7 @@
               class="text-xs px-2.5 py-1 rounded-full font-medium"
               :style="{
                 backgroundColor: getCategoryMeta(todaysQuiz.category).color + '30',
-                color: getCategoryMeta(todaysQuiz.category).color === '#FFFFBA' ? '#92600A' : darkenColor(getCategoryMeta(todaysQuiz.category).color)
+                color: darkenColor(getCategoryMeta(todaysQuiz.category).color)
               }"
             >
               {{ getCategoryMeta(todaysQuiz.category).name }}
@@ -194,7 +194,7 @@
             class="text-xs px-2.5 py-1 rounded-full font-medium"
             :style="{
               backgroundColor: getCategoryMeta(currentThought.category).color + '30',
-              color: getCategoryMeta(currentThought.category).color === '#FFFFBA' ? '#92600A' : darkenColor(getCategoryMeta(currentThought.category).color)
+              color: darkenColor(getCategoryMeta(currentThought.category).color)
             }"
           >
             {{ getCategoryMeta(currentThought.category).name }}
@@ -411,29 +411,29 @@ function darkenColor(hex: string): string {
   // Simple darken: just return a dark text color based on the pastel background
   // Map common pastel colors to readable dark colors
   const colorMap: Record<string, string> = {
-    '#FFB3BA': '#9B3545',
-    '#BAFFC9': '#2D7A3E',
-    '#BAE1FF': '#2D6A8E',
-    '#FFFFBA': '#8A8A2D',
-    '#E8BAFF': '#7A2D9B',
-    '#BAFFEE': '#2D7A6A',
-    '#FFD4BA': '#8E5A2D',
-    '#C9FFBA': '#4A7A2D',
-    '#D4BAFF': '#5A2D8E',
-    '#FFDAB9': '#8E5A2D',
-    '#FFB3DE': '#9B3570',
-    '#B3FFF0': '#2D7A6A',
-    '#C9D4FF': '#2D3D8E',
-    '#BAFFD4': '#2D7A4A',
-    '#FFDFBA': '#8E5A2D',
-    '#D4FFBA': '#4A7A2D',
-    '#FFE4BA': '#8E5A2D',
-    '#FFB3B3': '#9B3535',
-    '#D4D4BA': '#5A5A2D',
-    '#BAD4FF': '#2D4A8E',
-    '#FFBAD4': '#9B2D5A',
-    '#B4D4FF': '#2D4A8E',
-    '#D4BAE8': '#5A2D7A',
+    '#A07850': '#7A5830',
+    '#7A906B': '#5A7048',
+    '#6080A0': '#405878',
+    '#B0905B': '#8A6835',
+    '#8060A0': '#604080',
+    '#509880': '#307060',
+    '#B07850': '#8A5530',
+    '#509050': '#306830',
+    '#9050A0': '#703080',
+    '#A87050': '#804830',
+    '#B05070': '#8A3050',
+    '#509888': '#307060',
+    '#5070A0': '#305080',
+    '#409050': '#206830',
+    '#A08B50': '#7A6830',
+    '#609040': '#407020',
+    '#B09040': '#8A6820',
+    '#B05050': '#8A3030',
+    '#909050': '#707030',
+    '#5070A8': '#305088',
+    '#B05060': '#8A3040',
+    '#5088A0': '#306880',
+    '#9050A8': '#703088',
   }
   return colorMap[hex] ?? '#555555'
 }

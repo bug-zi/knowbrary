@@ -23,12 +23,12 @@
     <div class="card-base mb-6">
       <div class="flex items-center justify-between mb-2">
         <span class="text-sm text-macaron-text-secondary">学习进度</span>
-        <span class="text-sm font-medium" :style="{ color: path.color }">{{ progress.percentage }}%</span>
+        <span class="text-sm font-medium text-macaron-cta">{{ progress.percentage }}%</span>
       </div>
       <div class="h-3 bg-macaron-border/40 rounded-full overflow-hidden">
         <div
-          class="h-full rounded-full transition-all duration-500"
-          :style="{ width: progress.percentage + '%', backgroundColor: path.color }"
+          class="h-full rounded-full transition-all duration-500 bg-macaron-cta"
+          :style="{ width: progress.percentage + '%' }"
         />
       </div>
       <div class="flex items-center gap-3 mt-2 text-xs text-macaron-text-secondary">
@@ -41,16 +41,16 @@
     <!-- Skill Tree -->
     <div class="card-base mb-6">
       <h2 class="text-lg font-semibold text-macaron-text mb-4">技能树</h2>
-      <div class="relative" style="min-height: 280px;">
+      <div ref="treeContainerRef" class="relative overflow-hidden" :style="{ height: treeHeight + 'px' }">
         <!-- SVG Lines -->
         <svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 1;">
           <line
             v-for="edge in path.edges"
             :key="`${edge.from}-${edge.to}`"
-            :x1="getNodePosition(edge.from).x"
-            :y1="getNodePosition(edge.from).y + 20"
-            :x2="getNodePosition(edge.to).x"
-            :y2="getNodePosition(edge.to).y - 20"
+            :x1="scaledPos(edge.from).x"
+            :y1="scaledPos(edge.from).y + nodeHalfH"
+            :x2="scaledPos(edge.to).x"
+            :y2="scaledPos(edge.to).y - nodeHalfH"
             :stroke="getEdgeColor(edge)"
             stroke-width="2"
             stroke-dasharray="6,3"
@@ -62,7 +62,7 @@
           v-for="node in path.nodes"
           :key="node.id"
           class="absolute -translate-x-1/2 -translate-y-1/2 z-10"
-          :style="{ left: getNodePosition(node.id).x + 'px', top: getNodePosition(node.id).y + 'px' }"
+          :style="{ left: scaledPos(node.id).x + 'px', top: scaledPos(node.id).y + 'px' }"
         >
           <NuxtLink
             v-if="getNodeState(node) !== 'locked'"
@@ -71,17 +71,17 @@
             @click="handleCardClick(node)"
           >
             <div
-              class="w-40 px-4 py-3 rounded-2xl shadow-sm border-2 text-center transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer"
+              class="px-3 py-2.5 rounded-2xl shadow-sm border-2 text-center transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer"
               :class="getNodeBgClass(node)"
-              :style="{ borderColor: getNodeState(node) === 'completed' ? path.color : path.color + '40' }"
+              :style="{ borderColor: getNodeState(node) === 'completed' ? 'var(--macaron-cta)' : 'var(--macaron-cta-light)', width: nodeW + 'px' }"
             >
               <div class="text-lg mb-1"><Icon :name="getNodeState(node) === 'completed' ? 'lucide:circle-check' : getNodeState(node) === 'available' ? 'lucide:book-open' : 'lucide:lock'" /></div>
               <div class="text-sm font-medium text-macaron-text truncate">{{ getCardTitle(node.cardId) }}</div>
-              <div v-if="getNodeState(node) === 'completed'" class="text-xs mt-1" :style="{ color: path.color }">已完成</div>
+              <div v-if="getNodeState(node) === 'completed'" class="text-xs mt-1 text-macaron-cta">已完成</div>
               <div v-else-if="getNodeState(node) === 'available'" class="text-xs mt-1 text-macaron-text-secondary">点击学习</div>
             </div>
           </NuxtLink>
-          <div v-else class="w-40 px-4 py-3 rounded-2xl shadow-sm border-2 text-center opacity-50 cursor-not-allowed" style="border-color: var(--macaron-svg-guide);">
+          <div v-else class="px-3 py-2.5 rounded-2xl shadow-sm border-2 text-center opacity-50 cursor-not-allowed" :style="{ borderColor: 'var(--macaron-cta-light, #D4C4B0)', width: nodeW + 'px' }">
             <div class="text-lg mb-1"><Icon name="lucide:lock" /></div>
             <div class="text-sm font-medium text-macaron-text-secondary truncate">{{ getCardTitle(node.cardId) }}</div>
             <div class="text-xs mt-1 text-macaron-text-secondary">需先完成前置</div>
@@ -139,6 +139,56 @@ function refreshProgress() {
   refreshKey.value++
 }
 
+// Responsive tree layout
+const treeContainerRef = ref<HTMLElement>()
+const containerWidth = ref(0)
+
+onMounted(() => {
+  nextTick(() => {
+    if (!treeContainerRef.value) return
+    containerWidth.value = treeContainerRef.value.offsetWidth
+    const ro = new ResizeObserver(entries => {
+      containerWidth.value = entries[0].contentRect.width
+    })
+    ro.observe(treeContainerRef.value)
+    onUnmounted(() => ro.disconnect())
+  })
+})
+
+const nodeW = computed(() => (containerWidth.value || 800) < 420 ? 110 : 160)
+const nodeHalfH = computed(() => (containerWidth.value || 800) < 420 ? 40 : 50)
+
+const treeHeight = computed(() => {
+  if (!path) return 300
+  const ys = path.nodes.map(n => n.position?.y || 0)
+  return Math.max(...ys) + nodeHalfH.value * 2 + 30
+})
+
+const scaledPos = computed(() => {
+  const w = containerWidth.value || 800
+  const nhH = nodeHalfH.value
+  const nW = nodeW.value
+  const nodes = path?.nodes || []
+  const allX = nodes.map(n => n.position?.x || 0)
+  const minX = allX.length ? Math.min(...allX) : 0
+  const maxX = allX.length ? Math.max(...allX) : 0
+
+  return (nodeId: string): { x: number; y: number } => {
+    const node = nodes.find(n => n.id === nodeId)
+    if (!node?.position) return { x: w / 2, y: 50 }
+
+    let x = w / 2
+    if (maxX > minX) {
+      const margin = nW / 2 + 16
+      const usable = w - margin * 2
+      x = margin + ((node.position.x - minX) / (maxX - minX)) * usable
+    }
+
+    const y = node.position.y + nhH + 10
+    return { x, y }
+  }
+})
+
 function getNodePosition(nodeId: string): { x: number; y: number } {
   if (!path) return { x: 0, y: 0 }
   const node = path.nodes.find(n => n.id === nodeId)
@@ -159,16 +209,16 @@ function getCardSlug(cardId: string): string {
 }
 
 function getEdgeColor(edge: PathEdge): string {
-  if (!path) return '#e5e7eb'
+  if (!path) return '#D4C4B0'
   const fromNode = path.nodes.find(n => n.id === edge.from)
   const toNode = path.nodes.find(n => n.id === edge.to)
-  if (!fromNode || !toNode) return '#e5e7eb'
+  if (!fromNode || !toNode) return '#D4C4B0'
   const fromState = getNodeState(fromNode)
   const toState = getNodeState(toNode)
   if (fromState === 'completed' && (toState === 'completed' || toState === 'available')) {
-    return path?.color || '#e5e7eb'
+    return '#D4A574'
   }
-  return '#e5e7eb'
+  return '#D4C4B0'
 }
 
 function getNodeBgClass(node: PathNode): string {

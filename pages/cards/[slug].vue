@@ -1,5 +1,5 @@
 <template>
-  <div class="card-detail-page relative overflow-hidden min-h-screen">
+  <div class="card-detail-page relative overflow-hidden">
     <!-- Background image -->
     <div
       class="fixed inset-0 bg-cover bg-center bg-no-repeat"
@@ -9,10 +9,10 @@
     </div>
 
     <!-- Main content -->
-    <div class="relative z-10 max-w-2xl mx-auto px-4 py-5 min-h-screen flex flex-col">
+    <div class="relative z-10 max-w-2xl mx-auto px-3 pt-2 pb-1 h-full flex flex-col">
       <template v-if="card">
         <!-- Top bar -->
-        <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center justify-between mb-1.5">
           <NuxtLink
             :to="backTo"
             class="flex items-center gap-1.5 text-macaron-cta hover:text-macaron-text transition-colors no-underline text-sm font-medium"
@@ -27,30 +27,30 @@
 
           <div class="flex items-center gap-0.5">
             <button
-              class="p-2 rounded-lg hover:bg-macaron-hover-bg transition-colors"
+              class="p-1.5 rounded-lg hover:bg-macaron-hover-bg transition-colors"
               @click="handleFavorite"
               :aria-label="isFav ? '取消收藏' : '收藏'"
             >
               <Icon
                 name="lucide:star"
-                class="w-5 h-5"
+                class="w-4 h-4"
                 :class="isFav ? 'text-macaron-cta' : 'text-macaron-muted'"
                 :style="isFav ? 'fill: var(--macaron-cta)' : ''"
               />
             </button>
             <button
               v-if="card && card.id.startsWith('ai-')"
-              class="p-2 rounded-lg hover:bg-macaron-danger-hover transition-colors text-macaron-muted hover:text-red-500"
+              class="p-1.5 rounded-lg hover:bg-macaron-danger-hover transition-colors text-macaron-muted hover:text-red-500"
               @click="handleDeleteCard"
               aria-label="删除卡片"
             >
-              <Icon name="lucide:trash-2" class="w-5 h-5" />
+              <Icon name="lucide:trash-2" class="w-4 h-4" />
             </button>
           </div>
         </div>
 
         <!-- Progress bar -->
-        <div class="h-1 bg-macaron-progress-track rounded-full mb-4 overflow-hidden">
+        <div class="h-1 bg-macaron-progress-track rounded-full mb-2 overflow-hidden flex-shrink-0">
           <div
             class="h-full rounded-full transition-all duration-500 ease-out bg-macaron-cta"
             :style="{ width: `${((currentSlide + 1) / totalSlides) * 100}%` }"
@@ -58,11 +58,11 @@
         </div>
 
         <!-- Slide area -->
-        <div class="relative flex-1">
+        <div class="relative flex-1 min-h-0">
           <!-- Slide track -->
           <div
             ref="slideContainer"
-            class="overflow-hidden cursor-pointer"
+            class="h-full overflow-hidden cursor-pointer"
             @click="onSlideClick"
             @touchstart="onTouchStart"
             @touchmove="onTouchMove"
@@ -74,10 +74,10 @@
             >
               <!-- Slide 0: Header -->
               <div class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card card-slide-inner overflow-hidden flex flex-col">
-                  <div class="p-6 md:p-8 flex flex-col flex-1">
+                <div class="card-detail-card overflow-hidden">
+                  <div class="p-4 md:p-5">
                     <!-- Tags row -->
-                    <div class="flex items-center gap-2 mb-4 flex-wrap">
+                    <div class="flex items-center gap-1.5 mb-2.5 flex-wrap">
                       <span class="card-warm-badge">
                         <Icon :name="categoryMeta.icon" class="inline w-3.5 h-3.5 align-text-bottom" />
                         {{ categoryMeta.name }}
@@ -92,27 +92,24 @@
                     </div>
 
                     <!-- Title -->
-                    <h1 class="text-2xl md:text-3xl font-bold text-macaron-text leading-tight tracking-tight">
+                    <h1 class="text-xl md:text-2xl font-bold text-macaron-text leading-tight tracking-tight">
                       {{ card.title }}
                     </h1>
 
                     <!-- One-liner -->
-                    <p class="mt-4 text-base md:text-lg text-macaron-text-secondary leading-relaxed">
+                    <p class="mt-2.5 text-sm md:text-base text-macaron-text-secondary leading-relaxed">
                       {{ card.oneLiner }}
                     </p>
 
                     <!-- Tags -->
-                    <div v-if="card.tags.length" class="flex flex-wrap gap-1.5 mt-5">
+                    <div v-if="card.tags.length" class="flex flex-wrap gap-1.5 mt-3">
                       <span v-for="tag in card.tags.slice(0, 6)" :key="tag" class="card-warm-tag">
                         {{ tag }}
                       </span>
                     </div>
 
-                    <!-- Spacer -->
-                    <div class="flex-1" />
-
                     <!-- Swipe hint -->
-                    <div class="flex items-center gap-1.5 mt-6 text-macaron-muted/80">
+                    <div class="flex items-center gap-1.5 mt-4 text-macaron-muted/80">
                       <Icon name="lucide:chevrons-right" class="w-3.5 h-3.5" />
                       <span class="text-xs">左右滑动或点击卡片继续阅读</span>
                     </div>
@@ -122,10 +119,10 @@
 
               <!-- Content slides -->
               <div v-for="(chunk, i) in contentChunks" :key="'content-' + i" class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card card-slide-inner flex flex-col overflow-hidden">
-                  <div class="p-6 md:p-8 flex flex-col flex-1">
+                <div class="card-detail-card overflow-hidden">
+                  <div class="p-4 md:p-5 max-h-[calc(100dvh-12rem)] overflow-y-auto">
                     <div class="flex-1 prose prose-sm max-w-none card-prose" v-html="chunk" />
-                    <div class="mt-4 pt-3 border-t border-macaron-border/50 flex items-center justify-between flex-shrink-0">
+                    <div class="mt-3 pt-2 border-t border-macaron-border/50 flex items-center justify-between flex-shrink-0">
                       <span class="text-xs text-macaron-muted/70">{{ card.title }}</span>
                       <span class="text-xs text-macaron-muted/70 tabular-nums">{{ 1 + i + 1 }} / {{ totalSlides }}</span>
                     </div>
@@ -135,24 +132,24 @@
 
               <!-- Key Data slide -->
               <div v-if="card.keyData.length" class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card card-slide-inner flex flex-col overflow-hidden">
-                  <div class="p-6 md:p-8 flex flex-col flex-1">
-                    <h2 class="text-lg font-semibold text-macaron-text mb-5 flex items-center gap-2 flex-shrink-0">
+                <div class="card-detail-card overflow-hidden">
+                  <div class="p-4 md:p-5 max-h-[calc(100dvh-12rem)] overflow-y-auto">
+                    <h2 class="text-lg font-semibold text-macaron-text mb-3 flex items-center gap-2 flex-shrink-0">
                       <Icon name="lucide:bar-chart-3" class="w-5 h-5 text-macaron-cta" />
                       关键数据
                     </h2>
-                    <div class="space-y-3 flex-1">
+                    <div class="space-y-2 flex-1">
                       <div
                         v-for="data in card.keyData"
                         :key="data.label"
-                        class="p-4 rounded-xl bg-macaron-card/40 backdrop-blur-sm"
+                        class="p-3 rounded-xl bg-macaron-card/40 backdrop-blur-sm"
                       >
                         <div class="font-medium text-macaron-text text-sm">{{ data.label }}</div>
                         <div class="text-xl font-bold mt-1.5" :style="{ color: categoryMeta.color }">{{ data.value }}</div>
                         <div v-if="data.description" class="text-xs text-macaron-text-secondary mt-1.5 leading-relaxed">{{ data.description }}</div>
                       </div>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-macaron-border/50 flex items-center justify-between flex-shrink-0">
+                    <div class="mt-3 pt-2 border-t border-macaron-border/50 flex items-center justify-between flex-shrink-0">
                       <span class="text-xs text-macaron-muted/70">{{ card.title }}</span>
                       <span class="text-xs text-macaron-muted/70 tabular-nums">{{ keyDataSlideIndex + 1 }} / {{ totalSlides }}</span>
                     </div>
@@ -162,24 +159,24 @@
 
               <!-- References slide -->
               <div v-if="card.references.length" class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card card-slide-inner flex flex-col overflow-hidden">
-                  <div class="p-6 md:p-8 flex flex-col flex-1">
-                    <h2 class="text-lg font-semibold text-macaron-text mb-5 flex items-center gap-2 flex-shrink-0">
+                <div class="card-detail-card overflow-hidden">
+                  <div class="p-4 md:p-5 max-h-[calc(100dvh-12rem)] overflow-y-auto">
+                    <h2 class="text-lg font-semibold text-macaron-text mb-3 flex items-center gap-2 flex-shrink-0">
                       <Icon name="lucide:book-open" class="w-5 h-5 text-macaron-cta" />
                       来源引用
                     </h2>
-                    <div class="space-y-2.5 flex-1">
+                    <div class="space-y-2 flex-1">
                       <div
                         v-for="ref in card.references"
                         :key="ref.id"
-                        class="p-3.5 rounded-xl bg-macaron-surface-alt text-sm leading-relaxed"
+                        class="p-3 rounded-xl bg-macaron-surface-alt text-sm leading-relaxed"
                       >
                         <span class="text-macaron-text-secondary font-mono text-xs">[{{ ref.id }}]</span>
                         <span class="text-macaron-text ml-1.5">{{ ref.title }}</span>
                         <span v-if="ref.author" class="text-macaron-text-secondary"> — {{ ref.author }}</span>
                       </div>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-macaron-border/50 flex items-center justify-between flex-shrink-0">
+                    <div class="mt-3 pt-2 border-t border-macaron-border/50 flex items-center justify-between flex-shrink-0">
                       <span class="text-xs text-macaron-muted/70">{{ card.title }}</span>
                       <span class="text-xs text-macaron-muted/70 tabular-nums">{{ refSlideIndex + 1 }} / {{ totalSlides }}</span>
                     </div>
@@ -189,9 +186,9 @@
 
               <!-- Related Cards slide -->
               <div v-if="relatedCards.length" class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card card-slide-inner flex flex-col overflow-hidden">
-                  <div class="p-6 md:p-8 flex flex-col flex-1">
-                    <h2 class="text-lg font-semibold text-macaron-text mb-5 flex items-center gap-2 flex-shrink-0">
+                <div class="card-detail-card overflow-hidden">
+                  <div class="p-4 md:p-5 max-h-[calc(100dvh-12rem)] overflow-y-auto">
+                    <h2 class="text-lg font-semibold text-macaron-text mb-3 flex items-center gap-2 flex-shrink-0">
                       <Icon name="lucide:link" class="w-5 h-5 text-macaron-cta" />
                       知识邻居
                     </h2>
@@ -200,7 +197,7 @@
                         v-for="related in relatedCards"
                         :key="related.id"
                         :to="`/cards/${related.slug}`"
-                        class="flex items-center gap-3 p-3.5 rounded-xl transition-colors no-underline bg-macaron-surface-alt hover:bg-macaron-hover-bg"
+                        class="flex items-center gap-3 p-3 rounded-xl transition-colors no-underline bg-macaron-surface-alt hover:bg-macaron-hover-bg"
                       >
                         <span
                           class="w-2.5 h-2.5 rounded-full flex-shrink-0"
@@ -210,7 +207,7 @@
                         <Icon name="lucide:chevron-right" class="w-4 h-4 ml-auto text-macaron-muted/60" />
                       </NuxtLink>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-macaron-border/50 flex items-center justify-between flex-shrink-0">
+                    <div class="mt-3 pt-2 border-t border-macaron-border/50 flex items-center justify-between flex-shrink-0">
                       <span class="text-xs text-macaron-muted/70">{{ card.title }}</span>
                       <span class="text-xs text-macaron-muted/70 tabular-nums">{{ relatedSlideIndex + 1 }} / {{ totalSlides }}</span>
                     </div>
@@ -222,12 +219,12 @@
         </div>
 
         <!-- Bottom pagination -->
-        <div class="flex items-center justify-center gap-2 mt-5 flex-shrink-0">
+        <div class="flex items-center justify-center gap-1.5 mt-2 flex-shrink-0 pb-1">
           <button
             v-for="i in totalSlides"
             :key="i"
             class="rounded-full transition-all duration-300"
-            :class="i - 1 === currentSlide ? 'w-6 h-2.5' : 'w-2.5 h-2.5'"
+            :class="i - 1 === currentSlide ? 'w-5 h-2' : 'w-2 h-2'"
             :style="{ backgroundColor: i - 1 === currentSlide ? categoryMeta.color : 'var(--macaron-muted-light)' }"
             @click="goToSlide(i - 1)"
             :aria-label="`第${i}页`"
