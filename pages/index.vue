@@ -8,21 +8,33 @@
       <div class="absolute inset-0 bg-macaron-card/40 dark:bg-[#1A1512]/70"></div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 relative h-full" style="z-index: 1;">
+    <div class="max-w-7xl mx-auto px-4 relative h-full flex flex-col items-center justify-center gap-6 md:gap-8" style="z-index: 1;">
 
-    <!-- 1. 标题区：调 top 值上下移动 -->
-    <section class="absolute left-0 right-0 text-center" style="top: 15%;">
-      <h1 class="text-3xl md:text-4xl font-bold text-macaron-text">
-        <Icon name="lucide:microscope" class="inline w-8 h-8 align-text-bottom" /> 万象研究所
+    <!-- 1. Hero Title -->
+    <section class="w-full text-center">
+      <!-- Decorative top line -->
+      <div class="hero-deco-line w-16 md:w-20 mx-auto mb-5 md:mb-6"></div>
+
+      <!-- Main title -->
+      <h1 class="font-heading font-bold text-macaron-text hero-title leading-none">
+        <span class="hero-char" style="--char-index: 0">万</span><span class="hero-char" style="--char-index: 1">象</span><span class="hero-char" style="--char-index: 2">研</span><span class="hero-char" style="--char-index: 3">究</span><span class="hero-char" style="--char-index: 4">所</span>
       </h1>
-      <p class="mt-[18px] text-base text-macaron-text-secondary max-w-md mx-auto">
-        每个人的随身知识实验室，通过知识卡片探索 21 个领域
+
+      <!-- Subtitle with artistic spacing -->
+      <p class="hero-subtitle mt-5 md:mt-6 text-macaron-text-secondary max-w-xs md:max-w-sm mx-auto font-body">
+        每个人的随身知识实验室
       </p>
+      <p class="hero-subtitle-desc mt-1.5 text-macaron-text-secondary/70 text-xs md:text-sm tracking-widest font-body">
+        通过知识卡片探索 21 个领域
+      </p>
+
+      <!-- Decorative bottom line -->
+      <div class="hero-deco-line w-10 md:w-12 mx-auto mt-5 md:mt-6"></div>
     </section>
 
-    <!-- 2. 按钮区：调 top 值上下移动 -->
-    <div class="absolute left-0 right-0 px-4" style="top: 40%;">
-      <div class="max-w-md mx-auto flex items-center gap-4">
+    <!-- 2. 按钮区 -->
+    <div class="w-full max-w-md mx-auto">
+      <div class="flex items-center gap-4">
         <button
           @click="exploreRandom"
           class="flex-1 py-2.5 bg-macaron-cta text-white rounded-card font-medium hover:bg-macaron-cta-hover transition-colors text-center"
@@ -38,24 +50,22 @@
       </div>
     </div>
 
-    <!-- 3. 每日知识：调 bottom 值上下移动 -->
-    <section class="absolute left-0 right-0 px-4" style="bottom: 30%;">
-      <div class="max-w-[688px] mx-auto">
-        <div
-          class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-macaron-card/60 backdrop-blur-md border border-macaron-border/40 shadow-card"
+    <!-- 3. 每日知识 -->
+    <section class="w-full max-w-[688px] mx-auto">
+      <div
+        class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-macaron-card/60 backdrop-blur-md border border-macaron-border/40 shadow-card"
+      >
+        <Icon name="lucide:lightbulb" class="shrink-0 w-5 h-5 text-macaron-cta" />
+        <p class="text-sm md:text-base text-macaron-text leading-relaxed flex-1 min-w-0">
+          {{ dailyFact }}
+        </p>
+        <button
+          class="shrink-0 p-1.5 rounded-full hover:bg-macaron-border/30 transition-all duration-200 active:scale-90 active:rotate-180"
+          aria-label="换一个"
+          @click="refreshFact"
         >
-          <Icon name="lucide:lightbulb" class="shrink-0 w-5 h-5 text-macaron-cta" />
-          <p class="text-sm md:text-base text-macaron-text leading-relaxed flex-1 min-w-0">
-            {{ dailyFact }}
-          </p>
-          <button
-            class="shrink-0 p-1.5 rounded-full hover:bg-macaron-border/30 transition-all duration-200 active:scale-90 active:rotate-180"
-            aria-label="换一个"
-            @click="refreshFact"
-          >
-            <Icon name="lucide:refresh-cw" class="w-4 h-4 text-macaron-text-secondary" />
-          </button>
-        </div>
+          <Icon name="lucide:refresh-cw" class="w-4 h-4 text-macaron-text-secondary" />
+        </button>
       </div>
     </section>
 

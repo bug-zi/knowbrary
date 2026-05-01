@@ -83,6 +83,82 @@
     @apply bg-macaron-bg text-macaron-text;
     font-family: 'Inter', 'Noto Sans SC', 'Source Han Sans', system-ui, -apple-system, sans-serif;
   }
+
+  /* === Hero Typography === */
+  .hero-title {
+    font-size: clamp(3rem, 14vw, 6rem);
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    text-indent: 0.12em;
+    text-shadow: 0 2px 12px rgba(62, 39, 35, 0.08);
+  }
+  .dark .hero-title {
+    text-shadow: 0 2px 16px rgba(232, 221, 208, 0.06);
+  }
+
+  .hero-char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+    animation: hero-char-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(0.15s + var(--char-index) * 0.12s);
+  }
+
+  @keyframes hero-char-in {
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .hero-subtitle {
+    font-size: clamp(0.95rem, 3.5vw, 1.15rem);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    line-height: 1.8;
+    opacity: 0;
+    animation: hero-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.7s forwards;
+  }
+
+  .hero-subtitle-desc {
+    opacity: 0;
+    animation: hero-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;
+  }
+
+  .hero-deco-line {
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--macaron-cta) 15%,
+      var(--macaron-cta) 85%,
+      transparent
+    );
+    opacity: 0;
+    animation: hero-line-in 0.7s ease-out 0.05s forwards;
+  }
+
+  @keyframes hero-line-in {
+    from { opacity: 0; transform: scaleX(0); }
+    to   { opacity: 0.5; transform: scaleX(1); }
+  }
+
+  @keyframes hero-fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-char,
+    .hero-subtitle,
+    .hero-subtitle-desc,
+    .hero-deco-line {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+    }
+  }
 }
 
 @layer components {
