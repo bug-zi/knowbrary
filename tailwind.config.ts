@@ -55,6 +55,10 @@ export default {
           'data-thinking': '#9050A8',
         },
       },
+      fontFamily: {
+        heading: ['"Noto Serif SC"', '"Crimson Pro"', 'serif'],
+        body: ['Inter', '"Noto Sans SC"', '"Source Han Sans"', 'system-ui', 'sans-serif'],
+      },
       borderRadius: {
         'card': '16px',
       },

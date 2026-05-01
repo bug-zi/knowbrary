@@ -74,7 +74,7 @@
             >
               <!-- Slide 0: Header -->
               <div class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card overflow-hidden">
+                <div class="card-detail-card overflow-hidden min-h-[30dvh] max-h-[calc(100dvh-10rem)] overflow-y-auto flex flex-col">
                   <div class="p-4 md:p-5">
                     <!-- Tags row -->
                     <div class="flex items-center gap-1.5 mb-2.5 flex-wrap">
@@ -119,9 +119,11 @@
 
               <!-- Content slides -->
               <div v-for="(chunk, i) in contentChunks" :key="'content-' + i" class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card overflow-hidden">
-                  <div class="p-4 md:p-5 max-h-[calc(100dvh-12rem)] overflow-y-auto">
-                    <div class="flex-1 prose prose-sm max-w-none card-prose" v-html="chunk" />
+                <div class="card-detail-card overflow-hidden min-h-[30dvh] flex flex-col">
+                  <div class="p-4 md:p-5 flex-1 flex flex-col max-h-[calc(100dvh-12rem)] overflow-y-auto">
+                    <div class="flex-1 flex flex-col justify-center">
+                      <div class="prose prose-sm max-w-none card-prose" v-html="chunk" />
+                    </div>
                     <div class="mt-3 pt-2 border-t border-macaron-border/50 flex items-center justify-between flex-shrink-0">
                       <span class="text-xs text-macaron-muted/70">{{ card.title }}</span>
                       <span class="text-xs text-macaron-muted/70 tabular-nums">{{ 1 + i + 1 }} / {{ totalSlides }}</span>
@@ -132,8 +134,8 @@
 
               <!-- Key Data slide -->
               <div v-if="card.keyData.length" class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card overflow-hidden">
-                  <div class="p-4 md:p-5 max-h-[calc(100dvh-12rem)] overflow-y-auto">
+                <div class="card-detail-card overflow-hidden min-h-[30dvh] flex flex-col">
+                  <div class="p-4 md:p-5 flex-1 flex flex-col max-h-[calc(100dvh-12rem)] overflow-y-auto">
                     <h2 class="text-lg font-semibold text-macaron-text mb-3 flex items-center gap-2 flex-shrink-0">
                       <Icon name="lucide:bar-chart-3" class="w-5 h-5 text-macaron-cta" />
                       关键数据
@@ -159,8 +161,8 @@
 
               <!-- References slide -->
               <div v-if="card.references.length" class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card overflow-hidden">
-                  <div class="p-4 md:p-5 max-h-[calc(100dvh-12rem)] overflow-y-auto">
+                <div class="card-detail-card overflow-hidden min-h-[30dvh] flex flex-col">
+                  <div class="p-4 md:p-5 flex-1 flex flex-col max-h-[calc(100dvh-12rem)] overflow-y-auto">
                     <h2 class="text-lg font-semibold text-macaron-text mb-3 flex items-center gap-2 flex-shrink-0">
                       <Icon name="lucide:book-open" class="w-5 h-5 text-macaron-cta" />
                       来源引用
@@ -186,8 +188,8 @@
 
               <!-- Related Cards slide -->
               <div v-if="relatedCards.length" class="w-full flex-shrink-0 px-0.5">
-                <div class="card-detail-card overflow-hidden">
-                  <div class="p-4 md:p-5 max-h-[calc(100dvh-12rem)] overflow-y-auto">
+                <div class="card-detail-card overflow-hidden min-h-[30dvh] flex flex-col">
+                  <div class="p-4 md:p-5 flex-1 flex flex-col max-h-[calc(100dvh-12rem)] overflow-y-auto">
                     <h2 class="text-lg font-semibold text-macaron-text mb-3 flex items-center gap-2 flex-shrink-0">
                       <Icon name="lucide:link" class="w-5 h-5 text-macaron-cta" />
                       知识邻居
@@ -464,10 +466,23 @@ const contentChunks = computed(() => {
   return chunks
 })
 
+function getSectionClass(title: string): string {
+  if (title.startsWith('你有没有想过')) return 'section-hook'
+  if (title.startsWith('一句话说清楚')) return 'section-summary'
+  if (title.startsWith('生活中的影子')) return 'section-life'
+  if (title.startsWith('背后的小原理')) return 'section-principle'
+  if (title.startsWith('你可能一直搞错')) return 'section-myth'
+  if (title.startsWith('所以呢')) return 'section-takeaway'
+  return ''
+}
+
 function renderMarkdown(text: string): string {
   let html = text
   html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>')
-  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>')
+  html = html.replace(/^## (.+)$/gm, (_, title) => {
+    const cls = getSectionClass(title)
+    return `<h2${cls ? ` class="${cls}"` : ''}>${title}</h2>`
+  })
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   html = html.split('\n\n').map(block => {
     if (block.startsWith('<h')) return block
@@ -511,6 +526,9 @@ function prevSlide() {
   if (currentSlide.value > 0) currentSlide.value--
 }
 function onSlideClick(e: MouseEvent) {
+  // Don't navigate if user is selecting text
+  const sel = window.getSelection()
+  if (sel && sel.toString().trim().length > 0) return
   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
   const clickX = e.clientX - rect.left
   if (clickX < rect.width / 2) prevSlide()
@@ -531,16 +549,23 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 // --- Touch swipe ---
 let touchStartX = 0
 let touchStartY = 0
+let touchMoved = false
 function onTouchStart(e: TouchEvent) {
   touchStartX = e.touches[0].clientX
   touchStartY = e.touches[0].clientY
+  touchMoved = false
 }
 function onTouchMove(e: TouchEvent) {
+  touchMoved = true
   const dx = Math.abs(e.touches[0].clientX - touchStartX)
   const dy = Math.abs(e.touches[0].clientY - touchStartY)
   if (dx > dy && dx > 10) e.preventDefault()
 }
 function onTouchEnd(e: TouchEvent) {
+  // Don't navigate if user was selecting text
+  const sel = window.getSelection()
+  if (sel && sel.toString().trim().length > 0) return
+  if (!touchMoved) return
   const dx = e.changedTouches[0].clientX - touchStartX
   const dy = e.changedTouches[0].clientY - touchStartY
   if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {

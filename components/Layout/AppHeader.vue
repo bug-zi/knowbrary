@@ -9,8 +9,39 @@
       <!-- Desktop nav -->
       <nav class="hidden md:flex items-center gap-1">
         <template v-for="item in navItems" :key="item.path">
+          <!-- Item with dropdown children -->
+          <div v-if="item.children" class="relative" @mouseenter="hoverDropdown = item.path" @mouseleave="hoverDropdown = null">
+            <button
+              class="px-3 py-1.5 rounded-xl text-sm bg-transparent border-none cursor-pointer transition-colors"
+              :class="isItemOrChildActive(item) ? 'text-macaron-cta font-medium' : 'text-macaron-text-secondary hover:bg-macaron-surface-hover hover:text-macaron-text'"
+              @click="navigateTo(item.path)"
+            >
+              <Icon :name="item.icon" class="inline w-4 h-4" /> {{ item.label }}
+              <Icon name="lucide:chevron-down" class="inline w-3 h-3 ml-0.5" />
+            </button>
+            <!-- pt-2 bridge eliminates mouseleave gap that mt-1 caused -->
+            <div
+              v-if="hoverDropdown === item.path"
+              class="absolute top-full left-0 pt-2 z-50"
+            >
+              <div class="bg-macaron-card border border-macaron-border rounded-xl shadow-lg py-1 min-w-[120px]">
+                <NuxtLink
+                  v-for="child in item.children"
+                  :key="child.path"
+                  :to="child.path"
+                  class="flex items-center gap-2.5 px-4 py-2.5 text-sm no-underline transition-colors whitespace-nowrap"
+                  :class="isActive(child.path) ? 'text-macaron-cta font-medium bg-macaron-badge-bg' : 'text-macaron-text-secondary hover:text-macaron-cta hover:bg-macaron-badge-bg'"
+                >
+                  <Icon :name="child.icon" class="w-4 h-4" />
+                  {{ child.label }}
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+
+          <!-- Normal link item -->
           <NuxtLink
-            v-if="item.path !== '/create'"
+            v-else-if="!item.requiresAi"
             :to="item.path"
             class="relative px-3 py-1.5 rounded-xl text-sm no-underline transition-colors"
             :class="isActive(item.path)
@@ -20,11 +51,13 @@
             <div v-if="isActive(item.path)" class="absolute inset-0 rounded-xl bg-macaron-cta/15"></div>
             <span class="relative z-[1]"><Icon :name="item.icon" class="inline w-4 h-4" /> {{ item.label }}</span>
           </NuxtLink>
+
+          <!-- AI required item -->
           <button
             v-else
             class="px-3 py-1.5 rounded-xl text-sm bg-transparent border-none cursor-pointer transition-colors"
             :class="hasActiveAi ? 'text-macaron-text-secondary hover:bg-macaron-surface-hover hover:text-macaron-text' : 'opacity-40 text-macaron-text-secondary'"
-            @click="handleCreateClick"
+            @click="handleAiRequiredClick(item.path)"
           >
             <Icon :name="item.icon" class="inline w-4 h-4" /> {{ item.label }}
           </button>
@@ -55,15 +88,31 @@
 </template>
 
 <script setup lang="ts">
+interface NavChild {
+  path: string
+  label: string
+  icon: string
+}
+
+interface NavItem {
+  path: string
+  label: string
+  icon: string
+  requiresAi?: boolean
+  children?: NavChild[]
+}
+
 defineEmits(['toggleSearch'])
 
 const route = useRoute()
 const colorMode = useColorMode()
 const isDark = computed(() => colorMode.value === 'dark')
+const hoverDropdown = ref<string | null>(null)
 
 function toggleTheme() {
   colorMode.preference = isDark.value ? 'light' : 'dark'
 }
+
 const { hasActiveAi, syncFromSupabase } = useAiConfig()
 
 function isActive(path: string) {
@@ -71,24 +120,39 @@ function isActive(path: string) {
   return route.path.startsWith(path)
 }
 
+function isItemOrChildActive(item: NavItem) {
+  if (isActive(item.path)) return true
+  return item.children?.some(c => isActive(c.path)) || false
+}
+
 onMounted(syncFromSupabase)
 
-const navItems = [
-  { path: '/', label: '首页', icon: 'lucide:home' },
-  { path: '/categories', label: '分类', icon: 'lucide:layout-grid' },
-  { path: '/paths', label: '路径', icon: 'lucide:route' },
-  { path: '/create', label: '创作', icon: 'lucide:wand-sparkles' },
-  { path: '/graph', label: '图谱', icon: 'lucide:share-2' },
-  { path: '/experiment', label: '实验', icon: 'lucide:flask-conical' },
-  { path: '/checkin', label: '打卡', icon: 'lucide:calendar-check' },
-  { path: '/profile', label: '我的', icon: 'lucide:user' },
+const navItems: NavItem[] = [
+  {
+    path: '/', label: '大厅', icon: 'lucide:home',
+    children: [
+      { path: '/categories', label: '万象', icon: 'lucide:layout-grid' },
+      { path: '/paths', label: '研途', icon: 'lucide:route' },
+    ],
+  },
+  { path: '/create', label: '创作', icon: 'lucide:wand-sparkles', requiresAi: true },
+  { path: '/verify', label: '辨真', icon: 'lucide:shield-check', requiresAi: true },
+  { path: '/experiment', label: '试炼', icon: 'lucide:flask-conical' },
+  { path: '/profile', label: '研究员', icon: 'lucide:user' },
+  {
+    path: '#more', label: '更多', icon: 'lucide:menu',
+    children: [
+      { path: '/graph', label: '星图', icon: 'lucide:share-2' },
+      { path: '/checkin', label: '足迹', icon: 'lucide:calendar-check' },
+    ],
+  },
 ]
 
-function handleCreateClick() {
+function handleAiRequiredClick(path: string) {
   if (hasActiveAi.value) {
-    navigateTo('/create')
+    navigateTo(path)
   } else {
-    alert('请先在「我的 → AI 配置」中启用一个模型')
+    alert('请先在「研究员 → AI 配置」中启用一个模型')
   }
 }
 </script>

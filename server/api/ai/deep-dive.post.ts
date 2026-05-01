@@ -1,6 +1,5 @@
-import type { AIProvider } from '~/types'
-import { buildCardPrompt } from '~/utils/ai-prompts'
-import type { Category } from '~/types'
+import type { AIProvider, Category } from '~/types'
+import { buildDeepDivePrompt } from '~/utils/ai-prompts'
 
 const PROVIDER_URLS: Record<AIProvider, string> = {
   deepseek: 'https://api.deepseek.com/v1/chat/completions',
@@ -12,16 +11,18 @@ const PROVIDER_URLS: Record<AIProvider, string> = {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { provider, apiKey, model, category, existingCardTitles, topicHint } = body as {
+  const { provider, apiKey, model, category, cardTitle, cardContent, cardOneLiner, existingCardTitles } = body as {
     provider: AIProvider
     apiKey: string
     model: string
     category: Category
+    cardTitle: string
+    cardContent: string
+    cardOneLiner: string
     existingCardTitles: string[]
-    topicHint?: { title: string; oneLiner: string }
   }
 
-  if (!provider || !apiKey || !model || !category) {
+  if (!provider || !apiKey || !model || !category || !cardTitle || !cardContent) {
     throw createError({ statusCode: 400, statusMessage: 'Missing required fields' })
   }
 
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: `Invalid provider: ${provider}` })
   }
 
-  const prompt = buildCardPrompt(category, existingCardTitles || [], topicHint)
+  const prompt = buildDeepDivePrompt(category, cardTitle, cardContent, cardOneLiner, existingCardTitles || [])
 
   const resp = await fetch(url, {
     method: 'POST',
@@ -45,7 +46,7 @@ export default defineEventHandler(async (event) => {
         { role: 'user', content: prompt },
       ],
       temperature: 0.8,
-      max_tokens: 4000,
+      max_tokens: 6000,
     }),
   })
 
@@ -57,7 +58,6 @@ export default defineEventHandler(async (event) => {
   const data = await resp.json()
   const result: string = data.choices[0].message.content
 
-  // Extract JSON from response (handle markdown code blocks)
   let jsonStr = result
   const jsonMatch = result.match(/```(?:json)?\s*([\s\S]*?)```/)
   if (jsonMatch) {

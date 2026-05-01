@@ -109,6 +109,12 @@ export const CARD_TYPE_LABELS: Record<CardType, string> = {
   culture: '文化',
 }
 
+export interface RelatedTopic {
+  title: string
+  oneLiner: string
+  angle: string
+}
+
 export function getCategoryMeta(id: Category): CategoryMeta {
   return CATEGORIES.find(c => c.id === id) || CATEGORIES[0]
 }

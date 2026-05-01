@@ -1,6 +1,5 @@
-import type { AIProvider } from '~/types'
-import { buildCardPrompt } from '~/utils/ai-prompts'
-import type { Category } from '~/types'
+import type { AIProvider, Category } from '~/types'
+import { buildRelatedTopicsPrompt } from '~/utils/ai-prompts'
 
 const PROVIDER_URLS: Record<AIProvider, string> = {
   deepseek: 'https://api.deepseek.com/v1/chat/completions',
@@ -12,16 +11,18 @@ const PROVIDER_URLS: Record<AIProvider, string> = {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { provider, apiKey, model, category, existingCardTitles, topicHint } = body as {
+  const { provider, apiKey, model, category, cardTitle, cardOneLiner, cardTags, existingCardTitles } = body as {
     provider: AIProvider
     apiKey: string
     model: string
     category: Category
+    cardTitle: string
+    cardOneLiner: string
+    cardTags: string[]
     existingCardTitles: string[]
-    topicHint?: { title: string; oneLiner: string }
   }
 
-  if (!provider || !apiKey || !model || !category) {
+  if (!provider || !apiKey || !model || !category || !cardTitle) {
     throw createError({ statusCode: 400, statusMessage: 'Missing required fields' })
   }
 
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: `Invalid provider: ${provider}` })
   }
 
-  const prompt = buildCardPrompt(category, existingCardTitles || [], topicHint)
+  const prompt = buildRelatedTopicsPrompt(category, cardTitle, cardOneLiner, cardTags || [], existingCardTitles || [])
 
   const resp = await fetch(url, {
     method: 'POST',
@@ -41,11 +42,11 @@ export default defineEventHandler(async (event) => {
     body: JSON.stringify({
       model,
       messages: [
-        { role: 'system', content: '你是一个知识科普内容创作专家。请严格按照要求的JSON格式输出，不要包含markdown代码块标记。' },
+        { role: 'system', content: '你是一个知识图谱专家。请严格按照要求的JSON数组格式输出，不要包含markdown代码块标记。' },
         { role: 'user', content: prompt },
       ],
-      temperature: 0.8,
-      max_tokens: 4000,
+      temperature: 0.9,
+      max_tokens: 2000,
     }),
   })
 
@@ -57,19 +58,18 @@ export default defineEventHandler(async (event) => {
   const data = await resp.json()
   const result: string = data.choices[0].message.content
 
-  // Extract JSON from response (handle markdown code blocks)
   let jsonStr = result
   const jsonMatch = result.match(/```(?:json)?\s*([\s\S]*?)```/)
   if (jsonMatch) {
     jsonStr = jsonMatch[1].trim()
   }
 
-  let card
+  let topics
   try {
-    card = JSON.parse(jsonStr)
+    topics = JSON.parse(jsonStr)
   } catch {
     throw createError({ statusCode: 500, statusMessage: 'AI returned invalid JSON', data: { raw: result } })
   }
 
-  return { card, raw: result }
+  return { topics, raw: result }
 })
