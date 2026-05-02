@@ -1,7 +1,10 @@
-import type { DailyQuiz, ThoughtExperiment, QuizResult } from '~/types/quizzes'
+import type { DailyQuiz, ThoughtExperiment, QuizResult, ThoughtReflection } from '~/types/quizzes'
 import { useSupabase } from './supabase'
 
 const QUIZ_RESULTS_KEY = 'wanxiang-quiz-results'
+const PRACTICE_RESULTS_KEY = 'wanxiang-practice-results'
+const THOUGHT_REFLECTIONS_KEY = 'wanxiang-thought-reflections'
+const DAILY_QUIZ_CACHE_PREFIX = 'wanxiang-daily-quiz-'
 let _quizzes: DailyQuiz[] | null = null
 let _experiments: ThoughtExperiment[] | null = null
 
@@ -21,10 +24,36 @@ export async function getAllQuizzes(): Promise<DailyQuiz[]> {
 }
 
 export async function getTodaysQuiz(): Promise<DailyQuiz | null> {
+  // 1. Check localStorage cache for today
+  if (import.meta.client) {
+    const today = new Date().toISOString().split('T')[0]
+    const cached = localStorage.getItem(DAILY_QUIZ_CACHE_PREFIX + today)
+    if (cached) {
+      try { return JSON.parse(cached) } catch { /* ignore */ }
+    }
+  }
+
+  // 2. Fallback: load from Supabase quizzes table
   const quizzes = await getAllQuizzes()
   if (!quizzes.length) return null
   const today = new Date().toISOString().split('T')[0]
   return quizzes.find(q => q.date === today) || quizzes[new Date().getDate() % quizzes.length]
+}
+
+export function cacheDailyQuiz(quiz: DailyQuiz): void {
+  if (import.meta.server) return
+  const today = new Date().toISOString().split('T')[0]
+  localStorage.setItem(DAILY_QUIZ_CACHE_PREFIX + today, JSON.stringify(quiz))
+}
+
+export function getCachedDailyQuiz(): DailyQuiz | null {
+  if (import.meta.server) return null
+  const today = new Date().toISOString().split('T')[0]
+  const cached = localStorage.getItem(DAILY_QUIZ_CACHE_PREFIX + today)
+  if (cached) {
+    try { return JSON.parse(cached) } catch { /* ignore */ }
+  }
+  return null
 }
 
 export async function getAllThoughtExperiments(): Promise<ThoughtExperiment[]> {
@@ -87,4 +116,54 @@ export function getQuizStats(): { totalAnswered: number; correctCount: number; a
   const results = getQuizResults()
   const correct = results.filter(r => r.isCorrect).length
   return { totalAnswered: results.length, correctCount: correct, accuracy: results.length > 0 ? Math.round((correct / results.length) * 100) : 0 }
+}
+
+// === Practice Mode ===
+
+export async function getPracticeQuiz(excludedIds: string[]): Promise<DailyQuiz | null> {
+  const quizzes = await getAllQuizzes()
+  const today = new Date().toISOString().split('T')[0]
+  const pool = quizzes.filter(q => !excludedIds.includes(q.id) && q.date !== today)
+  if (!pool.length) return null
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
+export function savePracticeResult(result: QuizResult): void {
+  if (import.meta.server) return
+  const results = getPracticeResults()
+  results.push(result)
+  localStorage.setItem(PRACTICE_RESULTS_KEY, JSON.stringify(results))
+}
+
+export function getPracticeResults(): QuizResult[] {
+  if (import.meta.server) return []
+  const s = localStorage.getItem(PRACTICE_RESULTS_KEY)
+  return s ? JSON.parse(s) : []
+}
+
+export function getPracticeStats(): { totalAnswered: number; correctCount: number; accuracy: number } {
+  if (import.meta.server) return { totalAnswered: 0, correctCount: 0, accuracy: 0 }
+  const results = getPracticeResults()
+  const correct = results.filter(r => r.isCorrect).length
+  return { totalAnswered: results.length, correctCount: correct, accuracy: results.length > 0 ? Math.round((correct / results.length) * 100) : 0 }
+}
+
+// === Thought Experiment Reflections ===
+
+export function saveThoughtReflection(reflection: ThoughtReflection): void {
+  if (import.meta.server) return
+  const all: ThoughtReflection[] = JSON.parse(localStorage.getItem(THOUGHT_REFLECTIONS_KEY) || '[]')
+  const idx = all.findIndex(r => r.experimentId === reflection.experimentId)
+  if (idx >= 0) {
+    all[idx] = reflection
+  } else {
+    all.push(reflection)
+  }
+  localStorage.setItem(THOUGHT_REFLECTIONS_KEY, JSON.stringify(all))
+}
+
+export function getThoughtReflection(experimentId: string): ThoughtReflection | null {
+  if (import.meta.server) return null
+  const all: ThoughtReflection[] = JSON.parse(localStorage.getItem(THOUGHT_REFLECTIONS_KEY) || '[]')
+  return all.find(r => r.experimentId === experimentId) || null
 }

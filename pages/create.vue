@@ -596,7 +596,7 @@
 import { CATEGORIES, AI_PROVIDERS, getCategoryMeta, DIFFICULTY_LABELS, CARD_TYPE_LABELS, type AIProvider, type AIConfig } from '~/types'
 import type { Category, KnowledgeCard, RelatedTopic } from '~/types'
 import type { LearningPath } from '~/types/paths'
-import { getAllCards, insertCard } from '~/utils/cards'
+import { getAllCards, insertCard, invalidateCardsCache } from '~/utils/cards'
 import { insertPath } from '~/utils/paths'
 
 definePageMeta({ layout: 'default' })
@@ -953,6 +953,8 @@ function handleArchive() {
   completionStep.value = 1
   setTimeout(() => {
     generatedCard.value = null
+    generateError.value = ''
+    deepDiveLoading.value = false
     step.value = 2
     showToast('已归档，草稿已丢弃')
   }, 200)
@@ -988,9 +990,12 @@ async function startGenerate() {
 
   generating.value = true
   generateError.value = ''
+  generatedCard.value = null
+  generatedPath.value = null
   step.value = 3
 
   try {
+    invalidateCardsCache()
     if (selectedType.value === 'card') {
       const allCards = await getAllCards()
       const existingTitles = [
@@ -1072,6 +1077,7 @@ async function saveResult() {
       selectedCategory.value = null
       generatedCard.value = null
       generatedPath.value = null
+      sessionGeneratedTitles.value = []
     }, 1500)
   } catch (err: any) {
     showToast(err?.message || '保存失败', false)

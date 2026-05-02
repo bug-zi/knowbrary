@@ -31,4 +31,28 @@ export interface QuizResult {
   selectedAnswer: string
   isCorrect: boolean
   answeredAt: string
+  isPractice?: boolean
+}
+
+export interface ThoughtReflection {
+  experimentId: string
+  choiceId: string
+  reflection: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface FunFact {
+  id: string
+  title: string
+  fact: string
+  explanation: string
+  relatedCards: string[]
+  category: string
+}
+
+export interface ShownFunFact {
+  id: string
+  title: string
+  shownAt: string // ISO date string
 }

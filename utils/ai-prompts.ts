@@ -2,6 +2,56 @@ import { CATEGORIES } from '~/types'
 import type { Category } from '~/types'
 import type { TavilyResult } from '~/types/fact-check'
 
+export function buildQuizPrompt(
+  cards: { title: string; content: string; category: string; oneLiner: string }[],
+  difficulty: string
+): string {
+  const diffLabel: Record<string, string> = {
+    beginner: '入门（简单回忆知识点）',
+    intermediate: '进阶（运用知识分析场景）',
+    advanced: '专业（深度推理与辨析）',
+  }
+  const cardsText = cards.map((c, i) =>
+    `### 卡片${i + 1}: ${c.title}\n分类: ${c.category}\n简介: ${c.oneLiner}\n内容摘要: ${c.content.slice(0, 500)}...`
+  ).join('\n\n')
+
+  return `你是一个知识测验出题专家。请基于以下知识卡片内容，生成一道选择题。
+
+## 素材卡片
+${cardsText}
+
+## 难度要求
+${diffLabel[difficulty] || '入门（简单回忆知识点）'}
+
+## 出题规则
+1. 题目必须基于上述卡片中的真实知识点，不能使用卡片以外的常识
+2. 用一个生活化的场景包装题目，让用户代入情境
+3. 4个选项 (a/b/c/d)，恰好一个正确答案
+4. 错误选项要有迷惑性，但不能是"部分正确"的模糊选项
+5. 解析要引用素材卡片的知识点，帮助用户理解为什么选这个
+6. relatedCardIds 填入素材卡片的ID（如果有）
+
+## 输出要求
+请严格按以下 JSON 格式输出，不要包含任何其他文字：
+
+{
+  "id": "quiz-${Date.now()}",
+  "question": "简洁明了的题目（一句话）",
+  "scenario": "生活化场景描述，包装成小故事",
+  "options": [
+    {"id": "a", "text": "选项文本"},
+    {"id": "b", "text": "选项文本"},
+    {"id": "c", "text": "选项文本"},
+    {"id": "d", "text": "选项文本"}
+  ],
+  "correctAnswer": "正确选项的id (a/b/c/d)",
+  "explanation": "详细解析，引用卡片知识点，200字以内",
+  "relatedCards": ["素材卡片ID"],
+  "category": "主素材卡片的分类id",
+  "difficulty": "${difficulty}"
+}`
+}
+
 export function buildCardPrompt(category: Category, existingCardTitles: string[], topicHint?: { title: string; oneLiner: string }): string {
   const catMeta = CATEGORIES.find(c => c.id === category)
   const catName = catMeta?.name || category
@@ -145,6 +195,44 @@ ${existingCards.length > 0 ? existingCards.map((c, i) => `${i + 1}. [ID: ${c.id}
 7. 确保根节点在顶部，叶子节点在底部
 8. 至少 1 个 required 节点，可包含 optional 和 bonus 节点
 9. icon 使用 lucide 图标名称，不要使用 emoji`
+}
+
+export function buildFunFactPrompt(
+  cardTitles: { id: string; title: string; category: string }[],
+  excludedTitles: string[]
+): string {
+  const cardsText = cardTitles.length > 0
+    ? cardTitles.map((c, i) => `${i + 1}. [ID: ${c.id}] ${c.title} (${c.category})`).join('\n')
+    : '（暂无卡片）'
+
+  const excludedSection = excludedTitles.length > 0
+    ? `\n## 已生成过的冷知识标题（请勿重复）\n${excludedTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')}`
+    : ''
+
+  return `你是一个擅长挖掘反直觉冷知识的科普专家。请为「万象研究所」知识学习平台生成一条令人惊讶的"每日冷知识"。
+
+## 要求
+1. 选一个大众普遍以为"理所当然"但其实完全反过来的知识点
+2. 标题要让人一看就想点进来（用"你知道吗…"/"为什么…"/"…其实…"等句式）
+3. fact 是一句让人"哇"的反直觉陈述，不超过100字
+4. explanation 是通俗易懂的科学解释，150-250字，像朋友聊天一样解释
+5. 必须从以下知识卡片中选择 1-3 张与冷知识相关的卡片，填入 relatedCards
+6. 不要生成过于冷门或没有科学依据的内容
+
+## 平台已有知识卡片
+${cardsText}
+${excludedSection}
+
+## 输出要求
+请严格按以下 JSON 格式输出，不要包含任何其他文字：
+
+{
+  "title": "反直觉的标题（15字以内）",
+  "fact": "让人惊讶的陈述（50-100字）",
+  "explanation": "科学解释（150-250字，通俗易懂）",
+  "relatedCards": ["关联的知识卡片ID"],
+  "category": "最相关的分类id"
+}`
 }
 
 export function buildFactCheckPrompt(claim: string, searchResults: TavilyResult[]): string {
