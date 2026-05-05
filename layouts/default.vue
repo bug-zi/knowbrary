@@ -14,4 +14,7 @@
 
 <script setup lang="ts">
 const showSearch = ref(false)
+
+// Initialize reading settings globally (applies CSS vars from localStorage)
+useReadingSettings()
 </script>

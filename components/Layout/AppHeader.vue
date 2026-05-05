@@ -144,6 +144,7 @@ const navItems: NavItem[] = [
     children: [
       { path: '/graph', label: '星图', icon: 'lucide:share-2' },
       { path: '/checkin', label: '足迹', icon: 'lucide:calendar-check' },
+      { path: '/dialogue', label: '谈心', icon: 'lucide:message-circle-heart' },
     ],
   },
 ]

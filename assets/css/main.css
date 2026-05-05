@@ -81,7 +81,9 @@
 
   body {
     @apply bg-macaron-bg text-macaron-text;
-    font-family: 'Inter', 'Noto Sans SC', 'Source Han Sans', system-ui, -apple-system, sans-serif;
+    font-family: var(--reading-font-family, 'Inter', 'Noto Sans SC', 'Source Han Sans', system-ui, -apple-system, sans-serif);
+    font-size: var(--reading-font-size, 16px);
+    font-weight: var(--reading-font-weight, 400);
   }
 
   /* === Hero Typography === */
@@ -368,12 +370,18 @@
     margin-bottom: 0.4rem;
   }
   .card-prose p {
+    font-family: var(--reading-font-family, 'Inter', 'Noto Sans SC', system-ui, sans-serif);
+    font-size: var(--reading-font-size, 16px);
+    font-weight: var(--reading-font-weight, 400);
     line-height: 1.85;
     letter-spacing: 0.02em;
     text-indent: 2em;
     user-select: text;
   }
   .card-prose li {
+    font-family: var(--reading-font-family, 'Inter', 'Noto Sans SC', system-ui, sans-serif);
+    font-size: var(--reading-font-size, 16px);
+    font-weight: var(--reading-font-weight, 400);
     line-height: 1.75;
     user-select: text;
   }

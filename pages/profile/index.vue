@@ -240,6 +240,17 @@
           </NuxtLink>
         </div>
 
+        <!-- Reading Config Link -->
+        <div class="flex items-center justify-between pt-2 border-t border-macaron-border">
+          <div>
+            <div class="text-sm font-medium text-macaron-text">阅读配置</div>
+            <div class="text-xs text-macaron-text-secondary">字体、字号、字重</div>
+          </div>
+          <NuxtLink to="/profile/reading" class="px-4 py-2 rounded-xl text-sm border border-macaron-border hover:bg-macaron-bg transition-colors no-underline text-macaron-text">
+            <Icon name="lucide:type" class="inline w-4 h-4 align-text-bottom" /> 前往配置
+          </NuxtLink>
+        </div>
+
         <!-- Clear data -->
         <div class="flex items-center justify-between">
           <div>
