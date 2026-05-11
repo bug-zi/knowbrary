@@ -53,6 +53,9 @@ export default {
           communication: '#B05060',
           'scientific-method': '#5088A0',
           'data-thinking': '#9050A8',
+          architecture: '#8B7B6B',
+          'design-thinking': '#A06080',
+          'daily-life': '#A08B70',
         },
       },
       fontFamily: {

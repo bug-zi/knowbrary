@@ -22,6 +22,9 @@ export type Category =
   | 'communication'
   | 'scientific-method'
   | 'data-thinking'
+  | 'architecture'
+  | 'design-thinking'
+  | 'daily-life'
 
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced'
 
@@ -90,6 +93,9 @@ export const CATEGORIES: CategoryMeta[] = [
   { id: 'communication', name: '传播学', icon: 'lucide:megaphone', color: '#B05060', description: '理解信息传播与媒体影响', cardCount: 0 },
   { id: 'scientific-method', name: '科学方法', icon: 'lucide:microscope', color: '#5088A0', description: '学会像科学家一样思考', cardCount: 0 },
   { id: 'data-thinking', name: '数据思维', icon: 'lucide:bar-chart-3', color: '#9050A8', description: '用数据驱动决策与判断', cardCount: 0 },
+  { id: 'architecture', name: '建筑学', icon: 'lucide:building-2', color: '#8B7B6B', description: '解读空间、结构与城市之美', cardCount: 0 },
+  { id: 'design-thinking', name: '设计思维', icon: 'lucide:pen-tool', color: '#A06080', description: '探索以人为中心的创新方法论', cardCount: 0 },
+  { id: 'daily-life', name: '生活常识', icon: 'lucide:coffee', color: '#A08B70', description: '实用生活知识，做个明白人', cardCount: 0 },
 ]
 
 export const DIFFICULTY_LABELS: Record<Difficulty, { label: string; icon: string }> = {
