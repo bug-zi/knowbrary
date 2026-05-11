@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-dvh pb-24 md:min-h-0 md:h-[calc(100dvh-6rem)] md:pb-0 md:overflow-hidden">
+  <div class="min-h-dvh pb-24 md:min-h-0 md:h-[calc(100dvh-6rem)] md:pb-0 md:overflow-y-auto">
     <!-- Decorative top gradient -->
     <div class="fixed top-0 left-0 right-0 h-64 pointer-events-none z-0"
       style="background: linear-gradient(180deg, var(--macaron-surface-hover-alt) 0%, transparent 100%);"
