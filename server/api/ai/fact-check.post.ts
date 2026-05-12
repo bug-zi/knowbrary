@@ -33,6 +33,9 @@ export default defineEventHandler(async (event) => {
   const tavilyKey = config.tavilyApiKey
 
   let searchResults: TavilyResult[] = []
+  let searchPerformed = false
+  let searchError = ''
+
   if (tavilyKey) {
     try {
       const tavilyResp = await fetch('https://api.tavily.com/search', {
@@ -55,10 +58,15 @@ export default defineEventHandler(async (event) => {
           content: r.content || '',
           score: r.score || 0,
         }))
+        searchPerformed = true
+      } else {
+        searchError = `Tavily API returned ${tavilyResp.status}`
       }
-    } catch {
-      // Search failure is non-fatal; continue with empty results
+    } catch (e: any) {
+      searchError = e?.message || 'Network error'
     }
+  } else {
+    searchError = 'TAVILY_API_KEY not configured'
   }
 
   // Step 2: AI analysis
@@ -107,5 +115,5 @@ export default defineEventHandler(async (event) => {
   report.checkedAt = new Date().toISOString()
   report.claim = claim
 
-  return { report, searchResults }
+  return { report, searchResults, searchPerformed, searchError }
 })

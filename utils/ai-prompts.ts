@@ -236,11 +236,14 @@ ${excludedSection}
 }
 
 export function buildFactCheckPrompt(claim: string, searchResults: TavilyResult[]): string {
-  const formattedResults = searchResults.map((r, i) =>
-    `[${i + 1}] ${r.title}\nURL: ${r.url}\n摘要: ${r.content}`
-  ).join('\n\n')
+  const hasResults = searchResults.length > 0
 
-  return `你是一个专业的事实核查助手。以下是一个需要验证的说法，以及通过网络搜索获取的相关资料。
+  if (hasResults) {
+    const formattedResults = searchResults.map((r, i) =>
+      `[${i + 1}] ${r.title}\nURL: ${r.url}\n摘要: ${r.content}`
+    ).join('\n\n')
+
+    return `你是一个专业的事实核查助手。以下是一个需要验证的说法，以及通过网络搜索获取的相关资料。
 
 ## 需要验证的说法
 ${claim}
@@ -286,6 +289,49 @@ ${formattedResults}
 6. keyTakeaways 给出 2-4 条核心要点
 7. 如果搜索资料不足以判断，verdict 应为 unverifiable，confidence 应低于 30
 8. 所有文字使用中文`
+  }
+
+  // No search results — AI must rely on training data only
+  return `你是一个专业的事实核查助手。以下是一个需要验证的说法。注意：本次未能通过网络搜索获取相关资料，你需要仅根据已有知识进行分析，并明确标注局限性。
+
+## 需要验证的说法
+${claim}
+
+## 重要提示
+本次未获取到网络搜索结果。请基于你的训练知识进行分析，但必须：
+- 在 summary 中说明"本报告未联网搜索，仅基于 AI 训练数据"
+- confidence 不超过 60
+- sources 留空数组
+
+## 输出格式
+请严格按以下 JSON 格式输出，不要包含任何其他文字：
+
+{
+  "claim": "原始说法",
+  "verdict": "reliable 或 unreliable 或 partially-reliable 或 unverifiable",
+  "confidence": 0到60的整数,
+  "summary": "2-3句话的综合评估（必须说明未联网搜索）",
+  "breakdown": [
+    {"aspect": "子观点描述", "finding": "验证发现", "verdict": "confirmed 或 refuted 或 inconclusive"}
+  ],
+  "evidenceFor": [
+    {"point": "支持的证据", "strength": "strong 或 moderate 或 weak"}
+  ],
+  "evidenceAgainst": [
+    {"point": "反对的证据", "strength": "strong 或 moderate 或 weak"}
+  ],
+  "sources": [],
+  "keyTakeaways": ["要点1", "要点2"]
+}
+
+要求：
+1. verdict 只能是 reliable / unreliable / partially-reliable / unverifiable
+2. confidence 不超过 60（因为未联网验证）
+3. breakdown 至少包含 2 个子观点分析
+4. evidenceFor 和 evidenceAgainst 至少各 1 条
+5. sources 必须为空数组（因为没有真实搜索来源）
+6. keyTakeaways 给出 2-4 条核心要点，第一条应提醒结果未经联网验证
+7. 所有文字使用中文`
 }
 
 export function buildDeepDivePrompt(

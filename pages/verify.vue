@@ -44,6 +44,8 @@
     <FactCheckReport
       v-else-if="state === 'report' && currentReport"
       :report="currentReport"
+      :search-performed="searchPerformed"
+      :search-error="searchError"
       @back="state = 'input'"
       @saved="onReportSaved"
     />
@@ -84,6 +86,8 @@ const client = useSupabase()
 type PageState = 'input' | 'loading' | 'report' | 'error'
 const state = ref<PageState>('input')
 const currentReport = ref<FactCheckReport | null>(null)
+const searchPerformed = ref(false)
+const searchError = ref('')
 const errorMessage = ref('')
 const history = ref<FactCheckRecord[]>([])
 
@@ -159,6 +163,8 @@ async function startFactCheck(claim: string) {
     const result = await $fetch<{
       report: FactCheckReport
       searchResults?: any[]
+      searchPerformed?: boolean
+      searchError?: string
     }>('/api/ai/fact-check', {
       method: 'POST',
       body: {
@@ -170,6 +176,8 @@ async function startFactCheck(claim: string) {
     })
 
     currentReport.value = result.report
+    searchPerformed.value = result.searchPerformed ?? false
+    searchError.value = result.searchError ?? ''
     state.value = 'report'
   } catch (err: any) {
     errorMessage.value = err?.data?.statusMessage || err?.message || '未知错误，请稍后重试'

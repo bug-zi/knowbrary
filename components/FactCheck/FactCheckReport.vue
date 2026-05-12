@@ -40,6 +40,21 @@
       </div>
     </div>
 
+    <!-- Search status warning -->
+    <div
+      v-if="!searchPerformed"
+      class="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700"
+    >
+      <Icon name="lucide:wifi-off" class="w-4 h-4 mt-0.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+      <div>
+        <p class="text-sm font-medium text-amber-800 dark:text-amber-300">未联网搜索</p>
+        <p class="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+          本次核查未使用网络搜索，结果仅基于 AI 训练数据，仅供参考。
+          <span v-if="searchError">原因：{{ searchError }}</span>
+        </p>
+      </div>
+    </div>
+
     <!-- B. Summary -->
     <div class="card-base">
       <h3 class="text-sm font-semibold text-macaron-text mb-2 flex items-center gap-2">
@@ -205,6 +220,8 @@ import { saveReportToSupabase } from '~/utils/fact-checks'
 const props = defineProps<{
   report: FactCheckReport
   disableSave?: boolean
+  searchPerformed?: boolean
+  searchError?: string
 }>()
 
 const emit = defineEmits<{
