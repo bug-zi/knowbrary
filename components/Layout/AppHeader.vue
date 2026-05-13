@@ -138,13 +138,14 @@ const navItems: NavItem[] = [
   { path: '/create', label: '创作', icon: 'lucide:wand-sparkles', requiresAi: true },
   { path: '/verify', label: '辨真', icon: 'lucide:shield-check', requiresAi: true },
   { path: '/experiment', label: '试炼', icon: 'lucide:flask-conical' },
-  { path: '/profile', label: '研究员', icon: 'lucide:user' },
+  { path: '/research', label: '洞察', icon: 'lucide:eye', requiresAi: true },
   {
     path: '#more', label: '更多', icon: 'lucide:menu',
     children: [
       { path: '/graph', label: '星图', icon: 'lucide:share-2' },
       { path: '/checkin', label: '足迹', icon: 'lucide:calendar-check' },
       { path: '/dialogue', label: '谈心', icon: 'lucide:message-circle-heart' },
+      { path: '/profile', label: '研究员', icon: 'lucide:user' },
     ],
   },
 ]

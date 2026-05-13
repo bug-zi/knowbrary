@@ -537,3 +537,263 @@ ${topicContext}
 5. closingThought 要像一封真诚的来信的结尾，有力量但不鸡汤
 6. 所有内容使用中文`
 }
+
+// ============================================
+// Research (洞察) prompts
+// ============================================
+
+export function buildResearchRoadmapPrompt(
+  topic: string,
+  description: string,
+  searchResults: TavilyResult[]
+): string {
+  const searchSection = searchResults.length > 0
+    ? `## 网络搜索结果\n${searchResults.map((r, i) => `[${i + 1}] ${r.title}\n${r.content}`).join('\n\n')}`
+    : '（未获取到搜索结果，请基于训练知识回答）'
+
+  return `你是一个深度研究向导。用户想要快速吃透一个陌生主题，你需要帮他画出一张学习路线图。
+
+## 研究主题
+${topic}
+
+## 用户背景
+${description || '（无额外说明）'}
+
+${searchSection}
+
+## 你的任务
+基于主题和搜索结果，生成一份结构化的研究路线图。要求：
+1. 覆盖该领域最核心的知识节点（文献、书籍、人物、概念、资源、最新进展）
+2. 每个条目标注优先级：essential（必须了解）、recommended（推荐了解）、optional（锦上添花）
+3. 给出该领域的核心问题和 3-5 个值得深入的角度
+
+## 输出格式
+请严格按以下 JSON 格式输出，不要包含任何其他文字：
+
+{
+  "topicSummary": "AI 对这个主题范围的理解（50-100字）",
+  "coreQuestion": "这个领域最核心的一个问题",
+  "items": [
+    {
+      "id": "item-1",
+      "type": "paper 或 book 或 person 或 concept 或 resource 或 recent-development",
+      "title": "条目标题",
+      "description": "这个条目是什么（50-100字）",
+      "relevance": "为什么研究这个主题必须了解它（30-60字）",
+      "priority": "essential 或 recommended 或 optional"
+    }
+  ],
+  "suggestedAngles": ["角度1", "角度2", "角度3"]
+}
+
+要求：
+1. items 提供 8-15 个条目，覆盖不同类型
+2. 至少 2 个 essential、3 个 recommended
+3. 每个 type 至少出现一次
+4. suggestedAngles 给出 3-5 个深入方向
+5. 所有文字使用中文
+6. 如果有搜索结果，优先基于搜索结果推荐真实存在的文献和人物`
+}
+
+export function buildResearchQAPrompt(
+  topic: string,
+  question: string,
+  contextNotes: { type: string; content: string }[]
+): string {
+  const notesSection = contextNotes.length > 0
+    ? `## 用户已有的研究笔记\n${contextNotes.map((n, i) => `[${i + 1}] (${n.type}) ${n.content}`).join('\n')}`
+    : '（用户还没有笔记）'
+
+  return `你是一个研究助理，正在帮助用户深入研究「${topic}」这个主题。用户在阅读过程中遇到了一个具体问题。
+
+${notesSection}
+
+## 用户的问题
+${question}
+
+## 你的任务
+直接回答用户的问题。要求：
+1. 回答要具体，不要泛泛而谈
+2. 如果能联系用户已有的笔记，请建立关联
+3. 如果用户的问题暴露了一个常见的误解，温和地指出
+4. 如果不确定，坦诚说明
+5. 回答长度 100-300 字，像导师带学生一样`
+}
+
+export function buildResearchPanoramicPrompt(
+  topic: string,
+  description: string,
+  roadmap: { items: { title: string; isRead: boolean; userNote: string }[] },
+  notes: { type: string; content: string; aiResponse: string | null }[]
+): string {
+  const roadmapSummary = roadmap.items
+    .map(i => `- ${i.title} ${i.isRead ? '[已读]' : '[未读]'}${i.userNote ? ` — 笔记: ${i.userNote}` : ''}`)
+    .join('\n')
+
+  const notesSummary = notes.map((n, i) => {
+    let entry = `[${i + 1}] (${n.type}) ${n.content}`
+    if (n.aiResponse) entry += `\n    AI回答: ${n.aiResponse.slice(0, 200)}`
+    return entry
+  }).join('\n')
+
+  return `你是一个元分析研究员。用户正在研究「${topic}」这个主题，已经积累了一些材料。请全盘审视，生成一份全景分析。
+
+## 研究主题
+${topic}
+${description ? `\n## 研究背景\n${description}` : ''}
+
+## 路线图进度
+${roadmapSummary}
+
+## 研究笔记（共 ${notes.length} 条）
+${notesSummary}
+
+## 你的任务
+横向审视所有材料，生成一份全景分析报告。
+
+## 输出格式
+请严格按以下 JSON 格式输出，不要包含任何其他文字：
+
+{
+  "knowledgeMap": "这个领域的知识全景图描述（100-200字，像地图一样描述主要板块和它们的关系）",
+  "patterns": ["反复出现的模式1", "模式2", "模式3"],
+  "contradictions": ["不同来源之间的矛盾1", "矛盾2"],
+  "consensusPoints": ["各方共识1", "共识2"],
+  "openQuestions": ["尚未解决的核心问题1", "问题2", "问题3"],
+  "blindSpots": ["用户可能忽略的盲区1", "盲区2"]
+}
+
+要求：
+1. patterns 提供 3-5 个跨材料的模式
+2. contradictions 至少 1 个（如果材料足够）
+3. consensusPoints 至少 2 个
+4. openQuestions 提供 3-5 个真正开放的问题
+5. blindSpots 基于「用户读了什么 vs 没读什么」来推断
+6. 所有文字使用中文`
+}
+
+export function buildResearchOutputPrompt(
+  topic: string,
+  format: string,
+  roadmap: { items: { title: string; description: string; isRead: boolean }[] },
+  notes: { type: string; content: string }[],
+  analysis: { knowledgeMap: string; patterns: string[]; blindSpots: string[] }
+): string {
+  const readItems = roadmap.items.filter(i => i.isRead)
+  const materialsSummary = `已读材料: ${readItems.map(i => i.title).join('、') || '无'}\n笔记数: ${notes.length}`
+
+  return `你是一个研究总结专家。用户完成了对「${topic}」的深度研究，现在需要把研究成果整理成一份结构化输出。
+
+## 研究主题
+${topic}
+
+## 研究材料概览
+${materialsSummary}
+
+## 全景分析要点
+- 知识全景: ${analysis.knowledgeMap?.slice(0, 200) || '无'}
+- 发现的模式: ${analysis.patterns?.join('、') || '无'}
+- 可能的盲区: ${analysis.blindSpots?.join('、') || '无'}
+
+## 研究笔记
+${notes.map(n => `(${n.type}) ${n.content}`).join('\n')}
+
+## 输出格式要求
+请按「${format === 'article' ? '文章' : format === 'outline' ? '大纲' : format === 'mindmap' ? '思维导图文本' : '核心要点'}」格式输出。
+
+## 输出 JSON 格式
+请严格按以下 JSON 格式输出，不要包含任何其他文字：
+
+{
+  "title": "研究总结标题",
+  "sections": [
+    {
+      "heading": "章节标题",
+      "content": "章节内容（Markdown格式，200-500字）",
+      "keyPoints": ["要点1", "要点2"]
+    }
+  ],
+  "totalWordCount": 估算总字数
+}
+
+要求：
+1. ${format === 'article' ? '写成一篇完整的研究综述文章，有开头有结尾' : format === 'outline' ? '写成层次分明的大纲，每个节点有简短说明' : format === 'mindmap' ? '写成思维导图的文本形式，用缩进表示层级关系' : '提炼最核心的要点，每个要点配简短解释'}
+2. sections 提供 3-6 个章节
+3. 内容要综合用户的笔记和分析发现
+4. 所有文字使用中文`
+}
+
+export function buildResearchSelfTestPrompt(
+  topic: string,
+  roadmap: { items: { title: string; description: string }[] },
+  notes: { type: string; content: string }[],
+  analysis: { blindSpots: string[] },
+  output: { sections: { heading: string }[] }
+): string {
+  return `你是一个理解力检验专家。用户刚刚完成了对「${topic}」的深度研究，你需要设计自测题来检验 TA 是否真正理解了核心概念——特别要暴露"假理解"（以为自己懂了但其实没懂的地方）。
+
+## 研究材料概览
+路线图覆盖: ${roadmap.items.map(i => i.title).join('、')}
+笔记数量: ${notes.length}
+研究产出章节: ${output.sections.map(s => s.heading).join('、')}
+已知盲区: ${analysis.blindSpots?.join('、') || '无'}
+
+## 你的任务
+设计 5 道自测题。要求：
+1. 不是考察记忆，而是考察理解——能用自己话解释、能举一反三
+2. 至少 2 道题针对盲区设计，专门暴露"假理解"
+3. 每道题要有提示（不直接给答案，但给思考方向）
+4. 每道题要有参考答案（100-200字的模型回答）
+
+## 输出格式
+请严格按以下 JSON 格式输出，不要包含任何其他文字：
+
+{
+  "questions": [
+    {
+      "id": "q-1",
+      "question": "测试题（开放性问题，不是选择题）",
+      "hint": "一个帮助回忆的提示",
+      "suggestedAnswer": "参考答案（100-200字，展示深度理解应该达到的水准）"
+    }
+  ],
+  "overallGapSummary": "基于材料分析，用户最可能的知识盲区总结（100-200字）",
+  "suggestedNextSteps": ["建议1", "建议2", "建议3"]
+}
+
+要求：
+1. 恰好 5 道题
+2. 题目要从不同角度测试（概念理解、应用能力、边界辨析、跨领域联系、批判性思维）
+3. suggestedAnswer 要展示"真正理解"的样子，不仅是正确答案
+4. suggestedNextSteps 给出 2-4 条后续学习建议
+5. 所有文字使用中文`
+}
+
+export function buildResearchGapAnalysisPrompt(
+  question: string,
+  userAnswer: string,
+  suggestedAnswer: string,
+  confidence: string
+): string {
+  return `你是一个理解力评估师。请对比用户对一道测试题的回答和参考答案，分析理解差距。
+
+## 测试题
+${question}
+
+## 参考答案
+${suggestedAnswer}
+
+## 用户的回答
+${userAnswer || '（未作答）'}
+
+## 用户自评信心
+${confidence === 'sure' ? '很确定' : confidence === 'rough' ? '大致了解' : '不太确定'}
+
+## 你的任务
+给出简短的差距分析（50-150字）：
+1. 用户理解了什么
+2. 用户遗漏或误解了什么
+3. 建议如何补上这个差距
+
+直接输出分析文字，不需要 JSON 格式。`
+}
