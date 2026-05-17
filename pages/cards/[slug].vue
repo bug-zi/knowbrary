@@ -323,6 +323,7 @@ import { getCardBySlug, getRelatedCards, deleteCard } from '~/utils/cards'
 import { getCategoryMeta, DIFFICULTY_LABELS, CARD_TYPE_LABELS } from '~/types'
 import { isFavorite, toggleFavorite } from '~/utils/favorites'
 import { markCardLearned, isCardLearned } from '~/utils/progress'
+import { archiveCard, isArchived } from '~/utils/archive'
 
 const route = useRoute()
 const slug = route.params.slug as string
@@ -367,10 +368,10 @@ function showToast(text: string) {
 
 function handleArchive() {
   if (!card) return
-  markCardLearned(card.id)
-  learnedCompleted.value = true
+  archiveCard({ id: card.id, title: card.title, category: card.category })
   showCompletion.value = false
-  showToast('已归档')
+  showToast('已归档，7天后将自动删除')
+  setTimeout(() => navigateTo(backTo), 800)
 }
 
 function handleFavoriteAndClose() {

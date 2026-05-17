@@ -151,6 +151,7 @@ const navItems: NavItem[] = [
       { path: '/graph', label: '星图', icon: 'lucide:share-2' },
       { path: '/checkin', label: '足迹', icon: 'lucide:calendar-check' },
       { path: '/dialogue', label: '谈心', icon: 'lucide:message-circle-heart' },
+      { path: '/archive', label: '归档处', icon: 'lucide:archive' },
       { path: '/profile', label: '研究员', icon: 'lucide:user' },
     ],
   },

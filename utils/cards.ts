@@ -1,5 +1,6 @@
 import type { KnowledgeCard, Category, Difficulty, CardType } from '~/types'
 import { useSupabase } from './supabase'
+import { getArchivedCardIds } from './archive'
 
 // Client-side cache
 let _allCards: KnowledgeCard[] | null = null
@@ -34,7 +35,8 @@ export async function getAllCards(): Promise<KnowledgeCard[]> {
     return []
   }
 
-  _allCards = data.map(mapCard)
+  const archivedIds = getArchivedCardIds()
+  _allCards = data.map(mapCard).filter(c => !archivedIds.includes(c.id))
   return _allCards
 }
 
