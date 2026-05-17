@@ -34,9 +34,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: `Invalid provider: ${provider}` })
   }
 
-  // Tavily search
-  const config = useRuntimeConfig()
-  const tavilyKey = config.tavilyApiKey
+  // Tavily search — read at runtime first (works on Vercel serverless)
+  const tavilyKey = process.env.TAVILY_API_KEY || useRuntimeConfig().tavilyApiKey || ''
 
   let searchResults: TavilyResult[] = []
   let searchPerformed = false

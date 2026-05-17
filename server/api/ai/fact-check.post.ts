@@ -29,8 +29,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // Step 1: Web search via Tavily
-  const config = useRuntimeConfig()
-  const tavilyKey = config.tavilyApiKey
+  // Read at runtime first (works on Vercel serverless), fall back to build-time config
+  const tavilyKey = process.env.TAVILY_API_KEY || useRuntimeConfig().tavilyApiKey || ''
 
   let searchResults: TavilyResult[] = []
   let searchPerformed = false
