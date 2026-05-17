@@ -9,7 +9,7 @@
     </div>
 
     <!-- Hero Section: always full viewport -->
-    <div class="relative" style="height: calc(100dvh - 3.5rem - 3.5rem);">
+    <div class="relative h-[calc(100dvh-3.5rem)] pb-14 md:pb-0">
       <div class="max-w-7xl mx-auto px-4 relative h-full flex flex-col items-center justify-center gap-6 md:gap-8" style="z-index: 1;">
 
       <!-- 1. Hero Title -->
@@ -275,9 +275,19 @@ onMounted(async () => {
           observer.disconnect()
         }
       },
-      { threshold: 0.05, rootMargin: '0px 0px -50px 0px' }
+      { threshold: 0.1, rootMargin: '0px 0px -200px 0px' }
     )
     observer.observe(recommendationRef.value)
+
+    // Fallback: also trigger on scroll position
+    const onScroll = () => {
+      if (window.scrollY > window.innerHeight * 0.25) {
+        recommendationVisible.value = true
+        window.removeEventListener('scroll', onScroll)
+        observer.disconnect()
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
   }
 })
 
