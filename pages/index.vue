@@ -8,8 +8,8 @@
       <div class="absolute inset-0 bg-macaron-card/40 dark:bg-[#1A1512]/70"></div>
     </div>
 
-    <!-- Hero Section -->
-    <div class="relative" :class="showRecommendations ? 'h-auto py-10 md:py-16' : ''" :style="!showRecommendations ? 'height: calc(100dvh - 3.5rem - 3.5rem);' : ''">
+    <!-- Hero Section: always full viewport -->
+    <div class="relative" style="height: calc(100dvh - 3.5rem - 3.5rem);">
       <div class="max-w-7xl mx-auto px-4 relative h-full flex flex-col items-center justify-center gap-6 md:gap-8" style="z-index: 1;">
 
       <!-- 1. Hero Title -->
@@ -65,10 +65,25 @@
       </section>
 
       </div>
+
+      <!-- Scroll hint -->
+      <Transition name="scroll-hint">
+        <div v-if="showRecommendations && !recommendationVisible" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5" style="z-index: 1;">
+          <span class="text-xs text-macaron-text-secondary/60">向下滚动探索更多</span>
+          <div class="scroll-bounce">
+            <Icon name="lucide:chevrons-down" class="w-5 h-5 text-macaron-text-secondary/50" />
+          </div>
+        </div>
+      </Transition>
     </div>
 
-    <!-- Recommendation Sections (only for returning users with data) -->
+    <!-- Recommendation Sections: fade-in on scroll -->
     <template v-if="showRecommendations">
+      <div
+        ref="recommendationRef"
+        class="recommendation-section"
+        :class="{ 'is-visible': recommendationVisible }"
+      >
       <div class="relative max-w-5xl mx-auto px-4 space-y-8 mt-4" style="z-index: 1;">
 
         <!-- Personalized: 推荐复习 -->
@@ -203,6 +218,7 @@
         </section>
 
       </div>
+      </div>
     </template>
   </div>
 </template>
@@ -234,6 +250,9 @@ const exploreCards = ref<{ category: Category; name: string; cardCount: number }
 const interestProfile = ref<InterestProfile | null>(null)
 const showRecommendations = ref(false)
 
+const recommendationRef = ref<HTMLElement | null>(null)
+const recommendationVisible = ref(false)
+
 onMounted(async () => {
   if (cards.length === 0) return
   showRecommendations.value = true
@@ -245,6 +264,21 @@ onMounted(async () => {
   personalizedCards.value = personalized
   exploreCards.value = explore
   interestProfile.value = profile
+
+  // Setup scroll-triggered fade-in for recommendations
+  await nextTick()
+  if (recommendationRef.value) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          recommendationVisible.value = true
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.05, rootMargin: '0px 0px -50px 0px' }
+    )
+    observer.observe(recommendationRef.value)
+  }
 })
 
 // Daily knowledge: one-sentence science fact, rotates daily
@@ -305,3 +339,45 @@ function stopAutoRefresh() {
 onMounted(startAutoRefresh)
 onUnmounted(stopAutoRefresh)
 </script>
+
+<style scoped>
+/* Recommendation section: fade-in on scroll */
+.recommendation-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.recommendation-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger items only animate when parent is visible */
+.recommendation-section .stagger-item {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.recommendation-section.is-visible .stagger-item {
+  animation: fade-in-up 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--stagger-index, 0) * 60ms);
+}
+
+/* Scroll hint bounce */
+.scroll-bounce {
+  animation: gentle-bounce 2s ease-in-out infinite;
+}
+
+/* Scroll hint transition */
+.scroll-hint-enter-active { transition: opacity 0.4s ease; }
+.scroll-hint-leave-active { transition: opacity 0.3s ease; }
+.scroll-hint-enter-from,
+.scroll-hint-leave-to { opacity: 0; }
+
+@keyframes gentle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+</style>
