@@ -607,6 +607,14 @@ const client = useSupabase()
 const step = ref(1)
 const selectedType = ref<'card' | 'path' | null>(null)
 const selectedCategory = ref<Category | null>(null)
+
+// Pre-fill from query param (e.g. /create?category=economics)
+const route = useRoute()
+if (route.query.category) {
+  selectedType.value = 'card'
+  selectedCategory.value = route.query.category as Category
+  step.value = 2
+}
 const generating = ref(false)
 const generateError = ref('')
 const activeConfig = ref<{ provider: AIProvider; apiKey: string; model: string } | null>(null)

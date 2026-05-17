@@ -27,6 +27,17 @@ export type Category =
   | 'daily-life'
   | 'healthy-living'
   | 'emotional-intelligence'
+  | 'cognitive-biases'
+  | 'game-theory'
+  | 'mythology'
+  | 'criminology'
+  | 'paradoxes'
+  | 'human-limits'
+  | 'unsolved-mysteries'
+  | 'humor'
+  | 'logical-fallacies'
+  | 'lost-civilizations'
+  | 'materials-science'
 
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced'
 
@@ -114,6 +125,17 @@ export const CATEGORIES: CategoryMeta[] = [
   { id: 'daily-life', name: '生活常识', icon: 'lucide:coffee', color: '#A08B70', description: '实用生活知识，做个明白人', cardCount: 0 },
   { id: 'healthy-living', name: '健康生活', icon: 'lucide:heart-pulse', color: '#50A890', description: '用科学守护身体与心理的健康', cardCount: 0 },
   { id: 'emotional-intelligence', name: '沟通情商', icon: 'lucide:hand-heart', color: '#C07878', description: '提升沟通能力与情绪管理智慧', cardCount: 0 },
+  { id: 'cognitive-biases', name: '认知偏误', icon: 'lucide:brain-cog', color: '#9B7070', description: '识别思维陷阱，看穿认知偏误', cardCount: 0 },
+  { id: 'game-theory', name: '博弈与策略', icon: 'lucide:target', color: '#5A7A7A', description: '用博弈思维看透策略与选择', cardCount: 0 },
+  { id: 'mythology', name: '神话与民俗', icon: 'lucide:scroll', color: '#907868', description: '探索世界神话、传说与民俗文化', cardCount: 0 },
+  { id: 'criminology', name: '犯罪学与法医', icon: 'lucide:fingerprint', color: '#687888', description: '犯罪心理与法医鉴定的科学', cardCount: 0 },
+  { id: 'paradoxes', name: '悖论与思维实验', icon: 'lucide:infinity', color: '#8868A0', description: '烧脑悖论与颠覆常识的思维实验', cardCount: 0 },
+  { id: 'human-limits', name: '人类极限', icon: 'lucide:flame', color: '#A86848', description: '探索人体极限与超凡能力的科学', cardCount: 0 },
+  { id: 'unsolved-mysteries', name: '未解之谜', icon: 'lucide:help-circle', color: '#7068A8', description: '科学尚未破解的终极谜题', cardCount: 0 },
+  { id: 'humor', name: '幽默学', icon: 'lucide:laugh', color: '#B8A060', description: '认真分析笑话为什么好笑的学问', cardCount: 0 },
+  { id: 'logical-fallacies', name: '逻辑谬误', icon: 'lucide:unlink', color: '#889878', description: '识别日常论证中的推理漏洞', cardCount: 0 },
+  { id: 'lost-civilizations', name: '失落文明', icon: 'lucide:castle', color: '#A09080', description: '消失的帝国与被遗忘的城市', cardCount: 0 },
+  { id: 'materials-science', name: '材料学', icon: 'lucide:atom', color: '#587880', description: '日常物品背后隐藏的材料史诗', cardCount: 0 },
 ]
 
 export const DIFFICULTY_LABELS: Record<Difficulty, { label: string; icon: string }> = {

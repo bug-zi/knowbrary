@@ -10,6 +10,10 @@
         <h1 class="text-title font-bold text-macaron-text">{{ categoryMeta.name }}</h1>
         <p class="text-sm text-macaron-text-secondary">{{ categoryMeta.description }}</p>
       </div>
+      <NuxtLink :to="`/create?category=${category}`" class="ml-auto flex items-center gap-1.5 px-4 py-2 bg-macaron-cta text-white rounded-xl text-sm font-medium hover:bg-macaron-cta-hover transition-colors no-underline">
+        <Icon name="lucide:plus" class="w-4 h-4" />
+        创建卡片
+      </NuxtLink>
     </div>
 
     <!-- Filters (sticky on scroll) -->

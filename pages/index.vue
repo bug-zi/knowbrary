@@ -186,7 +186,7 @@
                       class="h-full rounded-full transition-all duration-500"
                       :style="{
                         width: `${Math.min(100, (cat.count / interestProfile.totalCards) * 100 * 2)}%`,
-                        backgroundColor: getCategoryMeta(cat.category as any).color,
+                        backgroundColor: 'var(--macaron-cta)',
                       }"
                     />
                   </div>

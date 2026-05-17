@@ -205,11 +205,13 @@ export function useRecommendation() {
         count,
       }))
 
+    const reviewedCount = getLearnedCardIds().length
+
     return {
       topTags,
       topCategories,
       totalCards: cards.length,
-      totalReviewed: reviewed.size,
+      totalReviewed: reviewedCount,
     }
   }
 
