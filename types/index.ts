@@ -68,6 +68,13 @@ export interface ExistingCardSummary {
   cardType: CardType
 }
 
+export interface InterestProfile {
+  topTags: { tag: string; score: number }[]
+  topCategories: { category: string; name: string; count: number }[]
+  totalLearned: number
+  totalFavorites: number
+}
+
 export interface CategoryMeta {
   id: Category
   name: string

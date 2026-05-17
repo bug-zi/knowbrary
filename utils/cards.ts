@@ -89,10 +89,37 @@ export async function filterCards(options: {
 }
 
 export async function getRelatedCards(card: KnowledgeCard): Promise<KnowledgeCard[]> {
-  const cards = await getAllCards()
-  return card.relatedCards
-    .map(id => cards.find(c => c.id === id))
-    .filter(Boolean) as KnowledgeCard[]
+  const [cards, { getCardNeighbors }] = await Promise.all([
+    getAllCards(),
+    import('~/utils/graph-data').then(m => m),
+  ])
+  const cardMap = new Map(cards.map(c => [c.id, c]))
+  const neighbors = await getCardNeighbors(card.id)
+
+  // Graph neighbors sorted by weight (strongest connection first)
+  const result: KnowledgeCard[] = []
+  const seen = new Set<string>()
+
+  for (const { neighborId } of neighbors) {
+    if (seen.has(neighborId)) continue
+    const c = cardMap.get(neighborId)
+    if (c) {
+      result.push(c)
+      seen.add(neighborId)
+    }
+  }
+
+  // Fallback: pad with manual relatedCards if graph has fewer results
+  for (const id of card.relatedCards) {
+    if (seen.has(id) || result.length >= 10) continue
+    const c = cardMap.get(id)
+    if (c) {
+      result.push(c)
+      seen.add(id)
+    }
+  }
+
+  return result
 }
 
 // Invalidate cache (call after mutations)

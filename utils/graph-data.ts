@@ -202,3 +202,20 @@ export async function getCategoryGraphData(categories: string[]): Promise<GraphD
     maxConnections: maxConn,
   }
 }
+
+export async function getCardNeighbors(cardId: string): Promise<{ neighborId: string; weight: number; sharedTags: string[] }[]> {
+  const data = await buildGraphData()
+  const neighbors: { neighborId: string; weight: number; sharedTags: string[] }[] = []
+
+  for (const link of data.links) {
+    const s = typeof link.source === 'string' ? link.source : link.source.id
+    const t = typeof link.target === 'string' ? link.target : link.target.id
+    if (s === cardId) {
+      neighbors.push({ neighborId: t, weight: link.weight, sharedTags: link.sharedTags || [] })
+    } else if (t === cardId) {
+      neighbors.push({ neighborId: s, weight: link.weight, sharedTags: link.sharedTags || [] })
+    }
+  }
+
+  return neighbors.sort((a, b) => b.weight - a.weight)
+}

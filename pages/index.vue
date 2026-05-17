@@ -1,5 +1,5 @@
 <template>
-  <div class="relative overflow-hidden" style="height: calc(100dvh - 3.5rem - 3.5rem);">
+  <div class="relative" :class="showRecommendations ? 'min-h-screen pb-20' : ''">
     <!-- Background -->
     <div
       class="fixed inset-0 bg-cover bg-center bg-no-repeat"
@@ -8,73 +8,208 @@
       <div class="absolute inset-0 bg-macaron-card/40 dark:bg-[#1A1512]/70"></div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 relative h-full flex flex-col items-center justify-center gap-6 md:gap-8" style="z-index: 1;">
+    <!-- Hero Section -->
+    <div class="relative" :class="showRecommendations ? 'h-auto py-10 md:py-16' : ''" :style="!showRecommendations ? 'height: calc(100dvh - 3.5rem - 3.5rem);' : ''">
+      <div class="max-w-7xl mx-auto px-4 relative h-full flex flex-col items-center justify-center gap-6 md:gap-8" style="z-index: 1;">
 
-    <!-- 1. Hero Title -->
-    <section class="w-full text-center">
-      <!-- Decorative top line -->
-      <div class="hero-deco-line w-16 md:w-20 mx-auto mb-5 md:mb-6"></div>
-
-      <!-- Main title -->
-      <h1 class="font-heading font-bold text-macaron-text hero-title leading-none">
-        <span class="hero-char" style="--char-index: 0">万</span><span class="hero-char" style="--char-index: 1">象</span><span class="hero-char" style="--char-index: 2">研</span><span class="hero-char" style="--char-index: 3">究</span><span class="hero-char" style="--char-index: 4">所</span>
-      </h1>
-
-      <!-- Subtitle with artistic spacing -->
-      <p class="hero-subtitle mt-5 md:mt-6 text-macaron-text-secondary max-w-xs md:max-w-sm mx-auto font-body">
-        每个人的随身知识实验室
-      </p>
-      <p class="hero-subtitle-desc mt-1.5 text-macaron-text-secondary/70 text-xs md:text-sm tracking-widest font-body">
-        通过知识卡片探索 21 个领域
-      </p>
-
-      <!-- Decorative bottom line -->
-      <div class="hero-deco-line w-10 md:w-12 mx-auto mt-5 md:mt-6"></div>
-    </section>
-
-    <!-- 2. 按钮区 -->
-    <div class="w-full max-w-md mx-auto">
-      <div class="flex items-center gap-4">
-        <button
-          @click="exploreRandom"
-          class="flex-1 py-2.5 bg-macaron-cta text-white rounded-card font-medium hover:bg-macaron-cta-hover transition-colors text-center"
-        >
-          开始探索
-        </button>
-        <NuxtLink
-          to="/experiment"
-          class="flex-1 py-2.5 bg-macaron-card text-macaron-text rounded-card font-medium shadow-card hover:shadow-card-hover transition-all no-underline text-center"
-        >
-          今日实验
-        </NuxtLink>
-      </div>
-    </div>
-
-    <!-- 3. 每日知识 -->
-    <section class="w-full max-w-[688px] mx-auto">
-      <div
-        class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-macaron-card/60 backdrop-blur-md border border-macaron-border/40 shadow-card"
-      >
-        <Icon name="lucide:lightbulb" class="shrink-0 w-5 h-5 text-macaron-cta" />
-        <p class="text-sm md:text-base text-macaron-text leading-relaxed flex-1 min-w-0">
-          {{ dailyFact }}
+      <!-- 1. Hero Title -->
+      <section class="w-full text-center">
+        <div class="hero-deco-line w-16 md:w-20 mx-auto mb-5 md:mb-6"></div>
+        <h1 class="font-heading font-bold text-macaron-text hero-title leading-none">
+          <span class="hero-char" style="--char-index: 0">万</span><span class="hero-char" style="--char-index: 1">象</span><span class="hero-char" style="--char-index: 2">研</span><span class="hero-char" style="--char-index: 3">究</span><span class="hero-char" style="--char-index: 4">所</span>
+        </h1>
+        <p class="hero-subtitle mt-5 md:mt-6 text-macaron-text-secondary max-w-xs md:max-w-sm mx-auto font-body">
+          每个人的随身知识实验室
         </p>
-        <button
-          class="shrink-0 p-1.5 rounded-full hover:bg-macaron-border/30 transition-all duration-200 active:scale-90 active:rotate-180"
-          aria-label="换一个"
-          @click="refreshFact"
-        >
-          <Icon name="lucide:refresh-cw" class="w-4 h-4 text-macaron-text-secondary" />
-        </button>
-      </div>
-    </section>
+        <p class="hero-subtitle-desc mt-1.5 text-macaron-text-secondary/70 text-xs md:text-sm tracking-widest font-body">
+          通过知识卡片探索 21 个领域
+        </p>
+        <div class="hero-deco-line w-10 md:w-12 mx-auto mt-5 md:mt-6"></div>
+      </section>
 
+      <!-- 2. Buttons -->
+      <div class="w-full max-w-md mx-auto">
+        <div class="flex items-center gap-4">
+          <button
+            @click="exploreRandom"
+            class="flex-1 py-2.5 bg-macaron-cta text-white rounded-card font-medium hover:bg-macaron-cta-hover transition-colors text-center"
+          >
+            开始探索
+          </button>
+          <NuxtLink
+            to="/experiment"
+            class="flex-1 py-2.5 bg-macaron-card text-macaron-text rounded-card font-medium shadow-card hover:shadow-card-hover transition-all no-underline text-center"
+          >
+            今日实验
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- 3. Daily Knowledge -->
+      <section class="w-full max-w-[688px] mx-auto">
+        <div
+          class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-macaron-card/60 backdrop-blur-md border border-macaron-border/40 shadow-card"
+        >
+          <Icon name="lucide:lightbulb" class="shrink-0 w-5 h-5 text-macaron-cta" />
+          <p class="text-sm md:text-base text-macaron-text leading-relaxed flex-1 min-w-0">
+            {{ dailyFact }}
+          </p>
+          <button
+            class="shrink-0 p-1.5 rounded-full hover:bg-macaron-border/30 transition-all duration-200 active:scale-90 active:rotate-180"
+            aria-label="换一个"
+            @click="refreshFact"
+          >
+            <Icon name="lucide:refresh-cw" class="w-4 h-4 text-macaron-text-secondary" />
+          </button>
+        </div>
+      </section>
+
+      </div>
     </div>
+
+    <!-- Recommendation Sections (only for returning users with data) -->
+    <template v-if="showRecommendations">
+      <div class="relative max-w-5xl mx-auto px-4 space-y-8 mt-4" style="z-index: 1;">
+
+        <!-- Personalized: 猜你想学 -->
+        <section v-if="personalizedCards.length > 0">
+          <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-macaron-cta/10">
+              <Icon name="lucide:sparkles" class="w-4 h-4 text-macaron-cta" />
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-macaron-text">猜你想学</h2>
+              <p class="text-xs text-macaron-text-secondary">基于你的兴趣标签智能推荐</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <NuxtLink
+              v-for="card in personalizedCards"
+              :key="card.id"
+              :to="`/cards/${card.slug}`"
+              class="group p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 hover:border-macaron-cta/30 hover:shadow-lg hover:shadow-macaron-cta/5 transition-all duration-300 no-underline"
+            >
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                  :style="{ backgroundColor: getCategoryMeta(card.category).color + '18' }"
+                >
+                  <Icon :name="getCategoryMeta(card.category).icon" class="w-4 h-4" :style="{ color: getCategoryMeta(card.category).color }" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-sm font-semibold text-macaron-text group-hover:text-macaron-cta transition-colors truncate">{{ card.title }}</h3>
+                  <p class="text-xs text-macaron-text-secondary mt-1 line-clamp-2 leading-relaxed">{{ card.oneLiner }}</p>
+                  <div class="flex flex-wrap gap-1 mt-2">
+                    <span v-for="tag in card.tags.slice(0, 3)" :key="tag" class="text-[10px] px-1.5 py-0.5 rounded-md bg-macaron-badge-bg text-macaron-text-secondary">
+                      {{ tag }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </NuxtLink>
+          </div>
+        </section>
+
+        <!-- Explore: 探索新领域 -->
+        <section v-if="exploreCards.length > 0">
+          <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-500/10">
+              <Icon name="lucide:compass" class="w-4 h-4 text-emerald-600" />
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-macaron-text">探索新领域</h2>
+              <p class="text-xs text-macaron-text-secondary">你还没涉足的学科方向</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <NuxtLink
+              v-for="card in exploreCards"
+              :key="card.id"
+              :to="`/cards/${card.slug}`"
+              class="group p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 hover:border-emerald-400/30 hover:shadow-lg hover:shadow-emerald-400/5 transition-all duration-300 no-underline"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  :style="{ backgroundColor: getCategoryMeta(card.category).color + '18' }"
+                >
+                  <Icon :name="getCategoryMeta(card.category).icon" class="w-5 h-5" :style="{ color: getCategoryMeta(card.category).color }" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-[11px] font-medium mb-0.5" :style="{ color: getCategoryMeta(card.category).color }">
+                    {{ getCategoryMeta(card.category).name }}
+                  </div>
+                  <h3 class="text-sm font-semibold text-macaron-text group-hover:text-emerald-600 transition-colors truncate">{{ card.title }}</h3>
+                  <p class="text-xs text-macaron-text-secondary mt-0.5 line-clamp-1">{{ card.oneLiner }}</p>
+                </div>
+                <Icon name="lucide:chevron-right" class="w-4 h-4 text-macaron-muted shrink-0 group-hover:text-emerald-600 transition-colors" />
+              </div>
+            </NuxtLink>
+          </div>
+        </section>
+
+        <!-- Interest Profile: 兴趣画像 -->
+        <section v-if="interestProfile && (interestProfile.topTags.length > 0 || interestProfile.topCategories.length > 0)">
+          <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-violet-500/10">
+              <Icon name="lucide:brain" class="w-4 h-4 text-violet-600" />
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-macaron-text">你的兴趣画像</h2>
+              <p class="text-xs text-macaron-text-secondary">已学习 {{ interestProfile.totalLearned }} 张，收藏 {{ interestProfile.totalFavorites }} 张</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 space-y-4">
+            <!-- Category progress bars -->
+            <div v-if="interestProfile.topCategories.length > 0">
+              <h3 class="text-xs font-semibold text-macaron-text-secondary mb-2">领域偏好</h3>
+              <div class="space-y-2">
+                <div v-for="cat in interestProfile.topCategories.slice(0, 6)" :key="cat.category" class="flex items-center gap-2.5">
+                  <span class="text-xs text-macaron-text w-14 shrink-0 truncate">{{ cat.name }}</span>
+                  <div class="flex-1 h-2 bg-macaron-border/40 rounded-full overflow-hidden">
+                    <div
+                      class="h-full rounded-full transition-all duration-500"
+                      :style="{
+                        width: `${Math.min(100, (cat.count / (interestProfile.totalLearned + interestProfile.totalFavorites)) * 100 * 2)}%`,
+                        backgroundColor: getCategoryMeta(cat.category as any).color,
+                      }"
+                    />
+                  </div>
+                  <span class="text-[10px] text-macaron-text-secondary w-8 text-right tabular-nums">{{ cat.count }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tag cloud -->
+            <div v-if="interestProfile.topTags.length > 0">
+              <h3 class="text-xs font-semibold text-macaron-text-secondary mb-2">兴趣标签</h3>
+              <div class="flex flex-wrap gap-1.5">
+                <span
+                  v-for="{ tag, score } in interestProfile.topTags"
+                  :key="tag"
+                  class="px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
+                  :style="{
+                    backgroundColor: `hsl(30, 60%, ${Math.max(85, 100 - score * 5)}%)`,
+                    color: `hsl(30, 40%, ${Math.min(40, 20 + score * 3)}%)`,
+                  }"
+                >
+                  {{ tag }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { getAllCards } from '~/utils/cards'
+import { getCategoryMeta } from '~/types'
+import type { KnowledgeCard, InterestProfile } from '~/types'
 
 useHead({
   bodyAttrs: { style: 'background-color: transparent' },
@@ -89,6 +224,27 @@ function exploreRandom() {
   const randomCard = cards[Math.floor(Math.random() * cards.length)]
   router.push(`/cards/${randomCard.slug}`)
 }
+
+// --- Recommendations ---
+const { getPersonalizedCards, getExploreCards, getUserInterestProfile, hasUserData } = useRecommendation()
+
+const personalizedCards = ref<KnowledgeCard[]>([])
+const exploreCards = ref<KnowledgeCard[]>([])
+const interestProfile = ref<InterestProfile | null>(null)
+const showRecommendations = ref(false)
+
+onMounted(async () => {
+  if (!hasUserData()) return
+  showRecommendations.value = true
+  const [personalized, explore, profile] = await Promise.all([
+    getPersonalizedCards(6),
+    getExploreCards(4),
+    getUserInterestProfile(),
+  ])
+  personalizedCards.value = personalized
+  exploreCards.value = explore
+  interestProfile.value = profile
+})
 
 // Daily knowledge: one-sentence science fact, rotates daily
 const dailyFacts = [
