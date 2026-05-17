@@ -50,7 +50,7 @@
         </NuxtLink>
         <!-- Delete button -->
         <button
-          class="absolute top-2 right-2 p-1.5 rounded-lg text-macaron-text-secondary hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+          class="absolute top-2 right-2 p-1.5 rounded-lg text-macaron-text-secondary hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all"
           title="删除"
           @click="startDelete(path)"
         >

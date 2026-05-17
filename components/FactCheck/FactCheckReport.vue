@@ -187,7 +187,7 @@
       class="w-full py-3 rounded-xl border-2 border-dashed border-macaron-border text-sm font-medium text-macaron-text-secondary hover:border-macaron-cta hover:text-macaron-cta hover:bg-macaron-badge-bg transition-colors mt-3"
       :class="{
         'border-macaron-cta/40 text-macaron-cta bg-macaron-badge-bg cursor-default': saved,
-        'border-red-300 text-red-500': saveError,
+        'border-red-300 dark:border-red-800 text-red-500': saveError,
         'cursor-pointer': !saved && !saving,
       }"
       :disabled="saving || saved"

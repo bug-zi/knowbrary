@@ -104,9 +104,9 @@
           </div>
 
           <!-- Explanation -->
-          <div class="bg-amber-50 rounded-xl p-4 mb-4">
-            <div class="font-medium text-amber-800 text-sm mb-1">解析</div>
-            <p class="text-sm text-amber-900 leading-relaxed">{{ todaysQuiz.explanation }}</p>
+          <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 mb-4">
+            <div class="font-medium text-amber-800 dark:text-amber-300 text-sm mb-1">解析</div>
+            <p class="text-sm text-amber-900 dark:text-amber-200 leading-relaxed">{{ todaysQuiz.explanation }}</p>
           </div>
 
           <!-- Related cards -->
@@ -166,7 +166,7 @@
           <h2 class="text-lg font-bold text-macaron-text mb-3">{{ todaysQuiz.question }}</h2>
 
           <!-- Scenario -->
-          <div class="bg-gradient-to-r from-orange-50 to-pink-50 rounded-xl p-4 mb-5">
+          <div class="bg-gradient-to-r from-orange-50 to-pink-50 dark:from-orange-900/20 dark:to-pink-900/20 rounded-xl p-4 mb-5">
             <p class="text-sm text-macaron-text leading-relaxed">{{ todaysQuiz.scenario }}</p>
           </div>
 
@@ -177,7 +177,7 @@
               :key="option.id"
               class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-200"
               :class="selectedOption === option.id
-                ? 'border-macaron-cta bg-pink-50'
+                ? 'border-macaron-cta bg-pink-50 dark:bg-pink-900/20'
                 : 'border-macaron-border bg-macaron-card hover:border-macaron-border'"
               @click="selectedOption = option.id"
             >
@@ -240,7 +240,7 @@
       <div v-if="isPracticeMode" class="mt-4">
         <div v-if="practiceQuiz" class="card-base">
           <div class="flex items-center gap-2 mb-4">
-            <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-600">
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
               练习模式
             </span>
             <span
@@ -259,7 +259,7 @@
 
           <h2 class="text-lg font-bold text-macaron-text mb-3">{{ practiceQuiz.question }}</h2>
 
-          <div class="bg-gradient-to-r from-orange-50 to-pink-50 rounded-xl p-4 mb-5">
+          <div class="bg-gradient-to-r from-orange-50 to-pink-50 dark:from-orange-900/20 dark:to-pink-900/20 rounded-xl p-4 mb-5">
             <p class="text-sm text-macaron-text leading-relaxed">{{ practiceQuiz.scenario }}</p>
           </div>
 
@@ -270,7 +270,7 @@
               :key="option.id"
               class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-200"
               :class="practiceSelectedOption === option.id
-                ? 'border-macaron-cta bg-pink-50'
+                ? 'border-macaron-cta bg-pink-50 dark:bg-pink-900/20'
                 : 'border-macaron-border bg-macaron-card hover:border-macaron-border'"
               @click="practiceSelectedOption = option.id"
             >
@@ -321,9 +321,9 @@
               </div>
             </div>
 
-            <div class="bg-amber-50 rounded-xl p-4 mb-4">
-              <div class="font-medium text-amber-800 text-sm mb-1">解析</div>
-              <p class="text-sm text-amber-900 leading-relaxed">{{ practiceQuiz.explanation }}</p>
+            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 mb-4">
+              <div class="font-medium text-amber-800 dark:text-amber-300 text-sm mb-1">解析</div>
+              <p class="text-sm text-amber-900 dark:text-amber-200 leading-relaxed">{{ practiceQuiz.explanation }}</p>
             </div>
 
             <div class="flex gap-3">
@@ -419,8 +419,8 @@
         <h2 class="text-lg font-bold text-macaron-text mb-4">{{ currentFunFact.title }}</h2>
 
         <!-- Surprising fact -->
-        <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 mb-5 border border-amber-100">
-          <p class="text-sm text-amber-900 leading-relaxed">{{ currentFunFact.fact }}</p>
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-4 mb-5 border border-amber-100 dark:border-amber-800/30">
+          <p class="text-sm text-amber-900 dark:text-amber-200 leading-relaxed">{{ currentFunFact.fact }}</p>
         </div>
 
         <!-- Why? button -->
@@ -436,12 +436,12 @@
 
         <!-- Explanation (revealed) -->
         <div v-if="factRevealed" class="mb-5 animate-fade-in">
-          <div class="bg-gradient-to-r from-sky-50 to-blue-50 rounded-xl p-4 border border-sky-100">
-            <div class="font-medium text-sky-800 text-sm mb-2 flex items-center gap-1.5">
+          <div class="bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-900/20 dark:to-blue-900/20 rounded-xl p-4 border border-sky-100 dark:border-sky-800/30">
+            <div class="font-medium text-sky-800 dark:text-sky-300 text-sm mb-2 flex items-center gap-1.5">
               <Icon name="lucide:book-open" class="w-3.5 h-3.5" />
               原来如此
             </div>
-            <p class="text-sm text-sky-900 leading-relaxed">{{ currentFunFact.explanation }}</p>
+            <p class="text-sm text-sky-900 dark:text-sky-200 leading-relaxed">{{ currentFunFact.explanation }}</p>
           </div>
         </div>
 

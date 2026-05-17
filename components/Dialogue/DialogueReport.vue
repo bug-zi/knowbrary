@@ -69,9 +69,9 @@
             <span
               class="px-2 py-0.5 rounded-md text-[10px] font-medium shrink-0 mt-0.5"
               :class="{
-                'bg-green-100 text-green-700': sug.difficulty === 'easy',
-                'bg-amber-100 text-amber-700': sug.difficulty === 'moderate',
-                'bg-blue-100 text-blue-700': sug.difficulty === 'ongoing',
+                'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': sug.difficulty === 'easy',
+                'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': sug.difficulty === 'moderate',
+                'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': sug.difficulty === 'ongoing',
               }"
             >
               {{ difficultyLabel(sug.difficulty) }}

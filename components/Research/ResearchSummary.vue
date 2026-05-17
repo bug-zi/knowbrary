@@ -1,7 +1,7 @@
 <template>
   <div class="text-center py-8 px-4">
     <div class="w-14 h-14 rounded-2xl bg-green-50 dark:bg-green-900/20 flex items-center justify-center mx-auto mb-3">
-      <Icon name="lucide:check-circle" class="w-7 h-7 text-green-500" />
+      <Icon name="lucide:check-circle" class="w-7 h-7 text-green-500 dark:text-green-400" />
     </div>
     <h3 class="text-lg font-semibold text-macaron-text mb-1">研究完成</h3>
     <p class="text-sm text-macaron-text-secondary mb-4 max-w-xs mx-auto">

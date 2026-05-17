@@ -124,10 +124,10 @@
           <!-- Legend -->
           <div class="flex items-center justify-end gap-1 mt-2 text-xs text-macaron-text-secondary">
             <span>少</span>
-            <div class="rounded-sm" style="width:12px;height:12px;background-color:#ebedf0;" />
-            <div class="rounded-sm" style="width:12px;height:12px;background-color:#9be9a8;" />
-            <div class="rounded-sm" style="width:12px;height:12px;background-color:#40c463;" />
-            <div class="rounded-sm" style="width:12px;height:12px;background-color:#30a14e;" />
+            <div class="rounded-sm" :style="{ width: '12px', height: '12px', backgroundColor: getHeatmapColor(0) }" />
+            <div class="rounded-sm" :style="{ width: '12px', height: '12px', backgroundColor: getHeatmapColor(1) }" />
+            <div class="rounded-sm" :style="{ width: '12px', height: '12px', backgroundColor: getHeatmapColor(4) }" />
+            <div class="rounded-sm" :style="{ width: '12px', height: '12px', backgroundColor: getHeatmapColor(6) }" />
             <span>多</span>
           </div>
         </div>
@@ -178,8 +178,10 @@
           <polygon
             v-if="radarAxes > 0"
             :points="radarTotalPoints"
-            fill="#6F4E3710"
-            stroke="#6F4E3730"
+            fill="var(--macaron-cta)"
+            fill-opacity="0.06"
+            stroke="var(--macaron-cta)"
+            stroke-opacity="0.19"
             stroke-width="1"
           />
 
@@ -187,8 +189,9 @@
           <polygon
             v-if="radarAxes > 0"
             :points="radarLearnedPoints"
-            fill="#6F4E3740"
-            stroke="#6F4E37"
+            fill="var(--macaron-cta)"
+            fill-opacity="0.25"
+            stroke="var(--macaron-cta)"
             stroke-width="1.5"
           />
 
@@ -262,7 +265,7 @@
             <div class="text-xs text-macaron-text-secondary">删除所有学习记录和收藏</div>
           </div>
           <button
-            class="px-4 py-2 rounded-xl text-sm border border-red-200 text-red-500 hover:bg-macaron-danger-hover transition-colors"
+            class="px-4 py-2 rounded-xl text-sm border border-red-200 dark:border-red-800 text-red-500 hover:bg-macaron-danger-hover transition-colors"
             @click="showClearConfirm = true"
           >
             清除全部
@@ -412,11 +415,22 @@ function labelY(i: number): number {
 }
 
 // --- Heatmap helpers ---
+const isDark = ref(false)
+if (import.meta.client) {
+  isDark.value = document.documentElement.classList.contains('dark')
+  const obs = new MutationObserver(() => {
+    isDark.value = document.documentElement.classList.contains('dark')
+  })
+  onMounted(() => obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] }))
+  onUnmounted(() => obs.disconnect())
+}
+
 function getHeatmapColor(count: number): string {
-  if (count === 0) return '#ebedf0'
-  if (count <= 2) return '#9be9a8'
-  if (count <= 5) return '#40c463'
-  return '#30a14e'
+  const dark = isDark.value
+  if (count === 0) return dark ? '#3D3530' : '#ebedf0'
+  if (count <= 2) return dark ? '#2d6a3e' : '#9be9a8'
+  if (count <= 5) return dark ? '#238636' : '#40c463'
+  return dark ? '#1a7f37' : '#30a14e'
 }
 
 function showTooltip(event: MouseEvent, day: { date: string; count: number }) {

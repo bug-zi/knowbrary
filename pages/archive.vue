@@ -51,7 +51,7 @@
             恢复
           </button>
           <button
-            class="px-3 py-1.5 rounded-lg text-sm font-medium text-red-500 border border-red-200 hover:bg-red-50 transition-colors cursor-pointer"
+            class="px-3 py-1.5 rounded-lg text-sm font-medium text-red-500 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
             @click="handlePermanentDelete(item.id)"
           >
             删除
