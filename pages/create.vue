@@ -287,7 +287,7 @@
     <div v-if="step === 4 && selectedType === 'card' && generatedCard" class="fixed inset-0 z-50 overflow-hidden">
       <!-- Background -->
       <div class="fixed inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('/bg1.png'); z-index: 0;">
-        <div class="absolute inset-0 bg-macaron-card/40" />
+        <div class="absolute inset-0 bg-image-overlay" />
       </div>
 
       <div class="relative z-10 max-w-2xl mx-auto px-3 pt-20 pb-1 h-full flex flex-col">
@@ -488,8 +488,7 @@
                       归档
                     </button>
                     <button
-                      class="flex-1 py-2.5 rounded-xl font-medium text-sm text-white transition-all duration-200 active:scale-[0.97] cursor-pointer"
-                      style="background: linear-gradient(135deg, #D4A574, #C49A6C)"
+                      class="flex-1 py-2.5 rounded-xl font-medium text-sm text-white transition-all duration-200 active:scale-[0.97] cursor-pointer bg-macaron-cta hover:bg-macaron-cta-hover"
                       @click="handleAddToLibrary"
                     >
                       <Icon name="lucide:library" class="inline w-3.5 h-3.5 align-text-bottom mr-1" />

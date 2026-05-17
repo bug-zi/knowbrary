@@ -5,7 +5,7 @@
       class="fixed inset-0 bg-cover bg-center bg-no-repeat"
       style="background-image: url('/bg1.png'); z-index: 0;"
     >
-      <div class="absolute inset-0 bg-macaron-card/40"></div>
+      <div class="absolute inset-0 bg-image-overlay"></div>
     </div>
 
     <!-- Main content -->

@@ -18,7 +18,7 @@
         v-for="d in difficulties"
         :key="d.value"
         class="px-3 py-1 rounded-full text-sm transition-colors"
-        :class="selectedDifficulty === d.value ? 'bg-macaron-cta text-white' : 'bg-macaron-card text-macaron-text-secondary hover:bg-white/80'"
+        :class="selectedDifficulty === d.value ? 'bg-macaron-cta text-white' : 'bg-macaron-card text-macaron-text-secondary hover:bg-macaron-hover-bg'"
         @click="selectedDifficulty = selectedDifficulty === d.value ? null : d.value"
       >
         <Icon :name="d.icon" class="inline w-4 h-4 align-text-bottom" /> {{ d.label }}
@@ -28,7 +28,7 @@
         v-for="t in cardTypes"
         :key="t.value"
         class="px-3 py-1 rounded-full text-sm transition-colors"
-        :class="selectedType === t.value ? 'bg-macaron-cta text-white' : 'bg-macaron-card text-macaron-text-secondary hover:bg-white/80'"
+        :class="selectedType === t.value ? 'bg-macaron-cta text-white' : 'bg-macaron-card text-macaron-text-secondary hover:bg-macaron-hover-bg'"
         @click="selectedType = selectedType === t.value ? null : t.value"
       >
         {{ t.label }}

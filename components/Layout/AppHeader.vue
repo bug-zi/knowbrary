@@ -110,7 +110,9 @@ const isDark = computed(() => colorMode.value === 'dark')
 const hoverDropdown = ref<string | null>(null)
 
 function toggleTheme() {
+  document.documentElement.classList.add('theme-transitioning')
   colorMode.preference = isDark.value ? 'light' : 'dark'
+  setTimeout(() => document.documentElement.classList.remove('theme-transitioning'), 350)
 }
 
 const { hasActiveAi, syncFromSupabase } = useAiConfig()

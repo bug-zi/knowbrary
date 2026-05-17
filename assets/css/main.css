@@ -79,11 +79,39 @@
     --macaron-hover-bg: #3D3530;
   }
 
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* Smooth theme transition — only during toggle */
+  html.theme-transitioning,
+  html.theme-transitioning *,
+  html.theme-transitioning *::before,
+  html.theme-transitioning *::after {
+    transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 300ms ease, opacity 300ms ease !important;
+  }
+
   body {
     @apply bg-macaron-bg text-macaron-text;
     font-family: var(--reading-font-family, 'Inter', 'Noto Sans SC', 'Source Han Sans', system-ui, -apple-system, sans-serif);
     font-size: var(--reading-font-size, 16px);
     font-weight: var(--reading-font-weight, 400);
+  }
+
+  /* Dark mode background image overlay */
+  .bg-image-overlay {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+  .dark .bg-image-overlay {
+    background-color: rgba(26, 21, 18, 0.78);
+  }
+
+  /* Dark mode: desaturate background images */
+  .dark .bg-cover {
+    filter: brightness(0.4) saturate(0.3);
   }
 
   /* === Hero Typography === */

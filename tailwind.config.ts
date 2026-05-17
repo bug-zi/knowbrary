@@ -57,6 +57,7 @@ export default {
           'design-thinking': '#A06080',
           'daily-life': '#A08B70',
           'healthy-living': '#50A890',
+          'emotional-intelligence': '#C07878',
         },
       },
       fontFamily: {

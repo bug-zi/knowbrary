@@ -1,7 +1,6 @@
 import type { KnowledgeCard, InterestProfile, Category } from '~/types'
 import { getCategoryMeta } from '~/types'
 import { getAllCards } from '~/utils/cards'
-import { getFavorites } from '~/utils/favorites'
 import { getLearnedCardIds } from '~/utils/progress'
 import { buildGraphData } from '~/utils/graph-data'
 
@@ -88,27 +87,27 @@ export function useRecommendation() {
 
   /**
    * Strategy 2: Review recommendations
-   * All cards in the app are created by the user, so they're all "learned".
-   * This recommends cards for REVIEW based on interest relevance and diversity.
+   * Recommends cards for review based on user's reviewed-card interest tags.
+   * Falls back to random diverse cards when no review history exists.
    */
   async function getPersonalizedCards(limit = 6): Promise<KnowledgeCard[]> {
     const cards = await ensureCards()
-    const favoriteIds = new Set(getFavorites())
+    const reviewed = new Set(getLearnedCardIds())
 
     if (cards.length === 0) return []
 
-    // Build interest tag scores from favorites (favorites = strong interest signal)
+    // Build interest tag scores from reviewed cards
     const tagScores = new Map<string, number>()
     for (const card of cards) {
-      const isFav = favoriteIds.has(card.id)
-      if (!isFav) continue
+      if (!reviewed.has(card.id)) continue
       for (const tag of card.tags) {
-        tagScores.set(tag, (tagScores.get(tag) || 0) + 3)
+        tagScores.set(tag, (tagScores.get(tag) || 0) + 1)
       }
     }
 
-    // Score all cards by interest relevance (for review priority)
+    // Score unreviewed cards by tag overlap with user interests
     const scored = cards
+      .filter(c => !reviewed.has(c.id))
       .map(c => ({
         card: c,
         score: c.tags.reduce((sum, t) => sum + (tagScores.get(t) || 0), 0),
@@ -126,7 +125,7 @@ export function useRecommendation() {
       if (result.length >= limit) break
     }
 
-    // If not enough scored cards (no favorites yet), pick random diverse cards
+    // If not enough scored cards (no review history), pick random diverse cards
     if (result.length < limit) {
       const existingIds = new Set(result.map(c => c.id))
       const remaining = cards.filter(c => !existingIds.has(c.id))
@@ -181,20 +180,13 @@ export function useRecommendation() {
    */
   async function getUserInterestProfile(): Promise<InterestProfile> {
     const cards = await ensureCards()
-    const favoriteIds = new Set(getFavorites())
-    const learned = new Set(getLearnedCardIds())
 
     const tagScores = new Map<string, number>()
     const catCounts = new Map<string, number>()
 
     for (const card of cards) {
-      const isFav = favoriteIds.has(card.id)
-      const isLearned = learned.has(card.id)
-      if (!isFav && !isLearned) continue
-
-      const weight = isFav ? 3 : 1
       for (const tag of card.tags) {
-        tagScores.set(tag, (tagScores.get(tag) || 0) + weight)
+        tagScores.set(tag, (tagScores.get(tag) || 0) + 1)
       }
       catCounts.set(card.category, (catCounts.get(card.category) || 0) + 1)
     }
@@ -216,8 +208,8 @@ export function useRecommendation() {
     return {
       topTags,
       topCategories,
-      totalLearned: learned.size,
-      totalFavorites: favoriteIds.size,
+      totalCards: cards.length,
+      totalReviewed: reviewed.size,
     }
   }
 
@@ -225,7 +217,7 @@ export function useRecommendation() {
    * Check if user has enough data for recommendations
    */
   function hasUserData(): boolean {
-    return getFavorites().length > 0 || getLearnedCardIds().length > 0
+    return getLearnedCardIds().length > 0
   }
 
   return {

@@ -5,7 +5,7 @@
       class="fixed inset-0 bg-cover bg-center bg-no-repeat"
       style="background-image: url('/bg1.png'); z-index: 0;"
     >
-      <div class="absolute inset-0 bg-macaron-card/40 dark:bg-[#1A1512]/70"></div>
+      <div class="absolute inset-0 bg-image-overlay"></div>
     </div>
 
     <!-- Hero Section: always full viewport -->
@@ -107,10 +107,9 @@
             >
               <div class="flex items-start gap-3">
                 <div
-                  class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
-                  :style="{ backgroundColor: getCategoryMeta(card.category).color + '18' }"
+                  class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 bg-macaron-cta/10"
                 >
-                  <Icon :name="getCategoryMeta(card.category).icon" class="w-4 h-4" :style="{ color: getCategoryMeta(card.category).color }" />
+                  <Icon :name="getCategoryMeta(card.category).icon" class="w-4 h-4 text-macaron-cta" />
                 </div>
                 <div class="min-w-0 flex-1">
                   <h3 class="text-sm font-semibold text-macaron-text group-hover:text-macaron-cta transition-colors truncate">{{ card.title }}</h3>
@@ -129,8 +128,8 @@
         <!-- Explore: 探索新领域 -->
         <section v-if="exploreCards.length > 0">
           <div class="flex items-center gap-2.5 mb-4">
-            <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-500/10">
-              <Icon name="lucide:compass" class="w-4 h-4 text-emerald-600" />
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-macaron-cta/10">
+              <Icon name="lucide:compass" class="w-4 h-4 text-macaron-cta" />
             </div>
             <div>
               <h2 class="text-lg font-bold text-macaron-text">探索新领域</h2>
@@ -142,23 +141,22 @@
               v-for="(exp, eidx) in exploreCards"
               :key="exp.category"
               :to="`/categories/${exp.category}`"
-              class="group p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 hover:border-emerald-400/30 hover:shadow-lg hover:shadow-emerald-400/5 transition-all duration-300 no-underline stagger-item"
+              class="group p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 hover:border-macaron-cta/30 hover:shadow-lg hover:shadow-macaron-cta/5 transition-all duration-300 no-underline stagger-item"
               :style="{ '--stagger-index': eidx }"
             >
               <div class="flex items-center gap-3">
                 <div
-                  class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  :style="{ backgroundColor: getCategoryMeta(exp.category).color + '18' }"
+                  class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-macaron-cta/10"
                 >
-                  <Icon :name="getCategoryMeta(exp.category).icon" class="w-5 h-5" :style="{ color: getCategoryMeta(exp.category).color }" />
+                  <Icon :name="getCategoryMeta(exp.category).icon" class="w-5 h-5 text-macaron-cta" />
                 </div>
                 <div class="min-w-0 flex-1">
-                  <div class="text-[11px] font-medium mb-0.5" :style="{ color: getCategoryMeta(exp.category).color }">
+                  <div class="text-[11px] font-medium mb-0.5 text-macaron-cta">
                     {{ exp.name }}
                   </div>
-                  <h3 class="text-sm font-semibold text-macaron-text group-hover:text-emerald-600 transition-colors">已有 {{ exp.cardCount }} 张卡片</h3>
+                  <h3 class="text-sm font-semibold text-macaron-text group-hover:text-macaron-cta transition-colors">已有 {{ exp.cardCount }} 张卡片</h3>
                 </div>
-                <Icon name="lucide:chevron-right" class="w-4 h-4 text-macaron-muted shrink-0 group-hover:text-emerald-600 transition-colors" />
+                <Icon name="lucide:chevron-right" class="w-4 h-4 text-macaron-muted shrink-0 group-hover:text-macaron-cta transition-colors" />
               </div>
             </NuxtLink>
           </div>
@@ -167,12 +165,12 @@
         <!-- Interest Profile: 兴趣画像 -->
         <section v-if="interestProfile && (interestProfile.topTags.length > 0 || interestProfile.topCategories.length > 0)">
           <div class="flex items-center gap-2.5 mb-4">
-            <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-violet-500/10">
-              <Icon name="lucide:brain" class="w-4 h-4 text-violet-600" />
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-macaron-cta/10">
+              <Icon name="lucide:brain" class="w-4 h-4 text-macaron-cta" />
             </div>
             <div>
               <h2 class="text-lg font-bold text-macaron-text">你的兴趣画像</h2>
-              <p class="text-xs text-macaron-text-secondary">已学习 {{ interestProfile.totalLearned }} 张，收藏 {{ interestProfile.totalFavorites }} 张</p>
+              <p class="text-xs text-macaron-text-secondary">已学习 {{ interestProfile.totalCards }} 张，已复习 {{ interestProfile.totalReviewed }} 张</p>
             </div>
           </div>
 
@@ -187,7 +185,7 @@
                     <div
                       class="h-full rounded-full transition-all duration-500"
                       :style="{
-                        width: `${Math.min(100, (cat.count / (interestProfile.totalLearned + interestProfile.totalFavorites)) * 100 * 2)}%`,
+                        width: `${Math.min(100, (cat.count / interestProfile.totalCards) * 100 * 2)}%`,
                         backgroundColor: getCategoryMeta(cat.category as any).color,
                       }"
                     />
@@ -204,10 +202,10 @@
                 <span
                   v-for="{ tag, score } in interestProfile.topTags"
                   :key="tag"
-                  class="px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
+                  class="px-2.5 py-1 rounded-lg text-xs font-medium transition-colors dark-tag"
                   :style="{
-                    backgroundColor: `hsl(30, 60%, ${Math.max(85, 100 - score * 5)}%)`,
-                    color: `hsl(30, 40%, ${Math.min(40, 20 + score * 3)}%)`,
+                    backgroundColor: isDark ? `hsl(30, 30%, ${Math.max(20, 30 - score * 2)}%)` : `hsl(30, 60%, ${Math.max(85, 100 - score * 5)}%)`,
+                    color: isDark ? `hsl(30, 40%, ${Math.min(75, 60 + score * 3)}%)` : `hsl(30, 40%, ${Math.min(40, 20 + score * 3)}%)`,
                   }"
                 >
                   {{ tag }}
@@ -235,6 +233,8 @@ useHead({
 const { data: allCards } = await useAsyncData('home-cards', () => getAllCards())
 const cards = allCards.value ?? []
 const router = useRouter()
+const colorMode = useColorMode()
+const isDark = computed(() => colorMode.value === 'dark')
 
 function exploreRandom() {
   if (!cards.length) return
