@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxt/icon'],
 
   app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       title: '万象研究所',
       meta: [

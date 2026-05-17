@@ -68,7 +68,45 @@ export default {
       },
       boxShadow: {
         'card': '0 2px 12px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 4px 20px rgba(0, 0, 0, 0.1)',
+        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.1)',
+        'glow': '0 0 20px rgba(111, 78, 55, 0.15)',
+      },
+      spacing: {
+        'gutter': '1.5rem',
+        'section': '4rem',
+        'section-lg': '6rem',
+      },
+      transitionDuration: {
+        'fast': '150ms',
+        'base': '250ms',
+        'slow': '400ms',
+      },
+      transitionTimingFunction: {
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+      },
+      fontSize: {
+        'display': ['clamp(2rem, 5vw, 3.5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'title': ['clamp(1.5rem, 3vw, 2rem)', { lineHeight: '1.2' }],
+        'subtitle': ['clamp(1rem, 2vw, 1.25rem)', { lineHeight: '1.4' }],
+      },
+      animation: {
+        'fade-in-up': 'fade-in-up 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in-scale': 'fade-in-scale 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'shimmer': 'shimmer 1.5s infinite',
+      },
+      keyframes: {
+        'fade-in-up': {
+          from: { opacity: '0', transform: 'translateY(12px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'fade-in-scale': {
+          from: { opacity: '0', transform: 'scale(0.95)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        'shimmer': {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' },
+        },
       },
     },
   },

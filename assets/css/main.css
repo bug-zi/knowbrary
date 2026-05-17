@@ -163,18 +163,34 @@
       animation: none !important;
     }
   }
+
+  /* === Page Transitions === */
+  .page-enter-active,
+  .page-leave-active {
+    transition: opacity 200ms ease-out, transform 200ms ease-out;
+  }
+  .page-enter-from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  .page-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 }
 
 @layer components {
   .card-base {
-    @apply rounded-2xl p-6 transition-all duration-200 border;
+    @apply rounded-2xl p-6 transition-all duration-base border;
     background: var(--macaron-card);
     border-color: var(--macaron-border);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .card-base:hover {
-    @apply -translate-y-0.5 shadow-md;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   }
 
   .badge-beginner {
@@ -423,6 +439,67 @@
 
   .animate-loading-bar {
     animation: loading-bar 5s ease-out forwards;
+  }
+
+  /* === Stagger Animation Utility === */
+  .stagger-item {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fade-in-up 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(var(--stagger-index, 0) * 60ms);
+  }
+
+  /* === Skeleton Loading === */
+  .skeleton {
+    border-radius: 8px;
+    background: linear-gradient(
+      90deg,
+      var(--macaron-card) 25%,
+      var(--macaron-border) 37%,
+      var(--macaron-card) 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .skeleton-card {
+    @apply rounded-2xl p-6 border;
+    border-color: var(--macaron-border);
+    background: var(--macaron-card);
+  }
+
+  .skeleton-text {
+    height: 14px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background: linear-gradient(
+      90deg,
+      var(--macaron-surface-alt) 25%,
+      var(--macaron-border) 37%,
+      var(--macaron-surface-alt) 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .skeleton-text-short {
+    width: 60%;
+  }
+
+  .skeleton-text-medium {
+    width: 80%;
+  }
+
+  .skeleton-circle {
+    border-radius: 50%;
+    background: linear-gradient(
+      90deg,
+      var(--macaron-surface-alt) 25%,
+      var(--macaron-border) 37%,
+      var(--macaron-surface-alt) 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
   }
 
 }

@@ -1,5 +1,8 @@
 <template>
-  <div class="card-base group relative">
+  <div
+    class="card-base group relative border-l-[3px] border-l-transparent hover:border-l-[var(--cat-color)]"
+    :style="{ '--cat-color': categoryMeta.color }"
+  >
     <NuxtLink :to="`/cards/${card.slug}`" class="block no-underline">
       <div class="flex items-start gap-3">
         <span
@@ -7,7 +10,7 @@
           :style="{ backgroundColor: categoryMeta.color }"
         />
         <div class="flex-1 min-w-0">
-          <h3 class="font-semibold text-macaron-text group-hover:text-macaron-cta transition-colors">
+          <h3 class="font-semibold text-macaron-text group-hover:text-macaron-cta group-hover:translate-x-1 transition-all">
             {{ card.title }}
           </h3>
           <p class="text-sm text-macaron-text-secondary mt-1 line-clamp-2">{{ card.oneLiner }}</p>
