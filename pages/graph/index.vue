@@ -24,8 +24,17 @@
         v-if="isLoading"
         class="absolute inset-0 flex items-center justify-center z-10 bg-macaron-graph-bg/80"
       >
-        <div class="flex flex-col items-center gap-3">
-          <Icon name="lucide:loader-2" class="w-8 h-8 text-macaron-cta animate-spin" />
+        <div class="flex flex-col items-center gap-4">
+          <!-- Skeleton graph nodes -->
+          <div class="relative w-64 h-48">
+            <div class="skeleton-circle absolute w-12 h-12 top-2 left-6" />
+            <div class="skeleton-circle absolute w-10 h-10 top-14 left-28" />
+            <div class="skeleton-circle absolute w-8 h-8 top-6 right-6" />
+            <div class="skeleton-circle absolute w-14 h-14 bottom-2 left-12" />
+            <div class="skeleton-circle absolute w-9 h-9 bottom-6 right-8" />
+            <div class="skeleton-circle absolute w-11 h-11 top-24 right-16" />
+            <div class="skeleton-circle absolute w-7 h-7 top-28 left-4" />
+          </div>
           <span class="text-sm text-macaron-text-secondary">加载知识图谱...</span>
         </div>
       </div>

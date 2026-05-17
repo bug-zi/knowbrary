@@ -26,6 +26,17 @@
           </span>
 
           <div class="flex items-center gap-0.5">
+            <button
+              class="p-1.5 rounded-lg hover:bg-macaron-hover-bg transition-colors"
+              @click="handleFavorite"
+              :aria-label="isFav ? '取消收藏' : '收藏'"
+            >
+              <Icon
+                name="lucide:star"
+                class="w-4 h-4"
+                :class="isFav ? 'text-macaron-cta' : 'text-macaron-muted'"
+                :style="isFav ? 'fill: var(--macaron-cta)' : ''"
+              />
             </button>
             <button
               v-if="card && card.id.startsWith('ai-')"

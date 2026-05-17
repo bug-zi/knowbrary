@@ -1,13 +1,13 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold text-macaron-text mb-6"><Icon name="lucide:route" class="inline w-6 h-6 align-text-bottom" /> 学习路径</h1>
+    <h1 class="text-title font-bold text-macaron-text mb-6"><Icon name="lucide:route" class="inline w-6 h-6 align-text-bottom" /> 学习路径</h1>
 
     <div class="space-y-4">
       <div
-        v-for="path in paths"
+        v-for="(path, index) in paths"
         :key="path.id"
-        class="card-base group relative"
-        :style="{ borderColor: path.color + '40' }"
+        class="card-base group relative stagger-item"
+        :style="{ borderColor: path.color + '40', '--stagger-index': index }"
       >
         <NuxtLink :to="`/paths/${path.slug}`" class="block no-underline">
           <div class="flex items-start gap-4">

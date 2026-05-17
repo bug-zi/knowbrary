@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+  <div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
     <!-- Section 1: User Header -->
     <section class="card-base text-center">
       <template v-if="isLoggedIn">
@@ -68,6 +68,9 @@
 
     <!-- Profile Editor -->
     <AuthProfileEditor :show="showProfileEditor" @close="showProfileEditor = false" />
+
+    <!-- Heatmap + Radar: side-by-side on desktop -->
+    <div class="lg:grid lg:grid-cols-2 lg:gap-6 space-y-6 lg:space-y-0">
     <section class="card-base">
       <h2 class="text-lg font-bold text-macaron-text mb-3"><Icon name="lucide:calendar" class="inline w-5 h-5 align-text-bottom" /> 学习热力图</h2>
       <p class="text-sm text-macaron-text-secondary mb-4">过去 16 周学习了 <span class="font-semibold text-macaron-text">{{ heatmapTotal }}</span> 张卡片</p>
@@ -224,6 +227,7 @@
         </div>
       </div>
     </section>
+    </div>
 
     <!-- Section 4: Settings -->
     <section class="card-base">

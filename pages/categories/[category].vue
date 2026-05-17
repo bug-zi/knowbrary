@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="max-w-5xl mx-auto px-4 py-8">
     <!-- Category Header -->
     <div class="flex items-center gap-3 mb-6">
       <NuxtLink to="/categories" class="text-macaron-text-secondary hover:text-macaron-text transition-colors no-underline">
@@ -7,13 +7,13 @@
       </NuxtLink>
       <Icon :name="categoryMeta.icon" class="text-2xl" />
       <div>
-        <h1 class="text-xl font-bold text-macaron-text">{{ categoryMeta.name }}</h1>
+        <h1 class="text-title font-bold text-macaron-text">{{ categoryMeta.name }}</h1>
         <p class="text-sm text-macaron-text-secondary">{{ categoryMeta.description }}</p>
       </div>
     </div>
 
-    <!-- Filters -->
-    <div class="flex items-center gap-2 mb-4 flex-wrap">
+    <!-- Filters (sticky on scroll) -->
+    <div class="sticky top-[3.5rem] z-10 -mx-4 px-4 py-2 bg-macaron-bg/90 backdrop-blur-sm border-b border-macaron-border/30 mb-4 flex items-center gap-2 flex-wrap">
       <button
         v-for="d in difficulties"
         :key="d.value"
@@ -37,7 +37,7 @@
 
     <!-- Card List -->
     <div class="space-y-3">
-      <CardListItem v-for="card in filteredCards" :key="card.id" :card="card" @deleted="refreshList" />
+      <CardListItem v-for="(card, index) in filteredCards" :key="card.id" :card="card" class="stagger-item" :style="{ '--stagger-index': index }" @deleted="refreshList" />
       <div v-if="!filteredCards.length" class="text-center py-12 text-macaron-text-secondary">
         暂无卡片，敬请期待
       </div>

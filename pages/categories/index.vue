@@ -1,13 +1,13 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold text-macaron-text mb-6"><Icon name="lucide:layout-grid" class="inline w-6 h-6 align-text-bottom" /> 全部分类</h1>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <h1 class="text-title font-bold text-macaron-text mb-6"><Icon name="lucide:layout-grid" class="inline w-6 h-6 align-text-bottom" /> 全部分类</h1>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
       <NuxtLink
-        v-for="cat in categoriesWithCounts"
+        v-for="(cat, index) in categoriesWithCounts"
         :key="cat.id"
         :to="`/categories/${cat.id}`"
-        class="card-base text-center no-underline py-6"
-        :style="{ borderColor: cat.color + '40' }"
+        class="card-base text-center no-underline py-6 stagger-item"
+        :style="{ borderColor: cat.color + '40', '--stagger-index': index }"
       >
         <Icon :name="cat.icon" class="text-3xl" />
         <div class="mt-2 font-semibold text-macaron-text">{{ cat.name }}</div>

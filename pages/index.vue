@@ -84,10 +84,11 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <NuxtLink
-              v-for="card in personalizedCards"
+              v-for="(card, index) in personalizedCards"
               :key="card.id"
               :to="`/cards/${card.slug}`"
-              class="group p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 hover:border-macaron-cta/30 hover:shadow-lg hover:shadow-macaron-cta/5 transition-all duration-300 no-underline"
+              class="group p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 hover:border-macaron-cta/30 hover:shadow-lg hover:shadow-macaron-cta/5 transition-all duration-300 no-underline stagger-item"
+              :style="{ '--stagger-index': index }"
             >
               <div class="flex items-start gap-3">
                 <div
@@ -123,10 +124,11 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <NuxtLink
-              v-for="exp in exploreCards"
+              v-for="(exp, eidx) in exploreCards"
               :key="exp.category"
               :to="`/categories/${exp.category}`"
-              class="group p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 hover:border-emerald-400/30 hover:shadow-lg hover:shadow-emerald-400/5 transition-all duration-300 no-underline"
+              class="group p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 hover:border-emerald-400/30 hover:shadow-lg hover:shadow-emerald-400/5 transition-all duration-300 no-underline stagger-item"
+              :style="{ '--stagger-index': eidx }"
             >
               <div class="flex items-center gap-3">
                 <div
