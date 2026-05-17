@@ -1,4 +1,4 @@
-import type { AIProvider } from '~/types'
+import type { AIProvider, CardType, ExistingCardSummary } from '~/types'
 import { buildCardPrompt } from '~/utils/ai-prompts'
 import type { Category } from '~/types'
 
@@ -12,12 +12,11 @@ const PROVIDER_URLS: Record<AIProvider, string> = {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { provider, apiKey, model, category, existingCardTitles, topicHint } = body as {
+  const { provider, apiKey, model, category, topicHint } = body as {
     provider: AIProvider
     apiKey: string
     model: string
     category: Category
-    existingCardTitles: string[]
     topicHint?: { title: string; oneLiner: string }
   }
 
@@ -25,12 +24,18 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Missing required fields' })
   }
 
+  // Support new format (existingCards) and legacy format (existingCardTitles)
+  const existingCards: ExistingCardSummary[] = body.existingCards
+    || (body.existingCardTitles || []).map((t: string) => ({
+         title: t, oneLiner: '', tags: [], cardType: 'concept' as CardType,
+       }))
+
   const url = PROVIDER_URLS[provider]
   if (!url) {
     throw createError({ statusCode: 400, statusMessage: `Invalid provider: ${provider}` })
   }
 
-  const prompt = buildCardPrompt(category, existingCardTitles || [], topicHint)
+  const prompt = buildCardPrompt(category, existingCards, topicHint)
 
   const resp = await fetch(url, {
     method: 'POST',

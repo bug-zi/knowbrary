@@ -25,6 +25,7 @@ export type Category =
   | 'architecture'
   | 'design-thinking'
   | 'daily-life'
+  | 'healthy-living'
 
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced'
 
@@ -58,6 +59,13 @@ export interface KnowledgeCard {
   relatedCards: string[]
   createdAt: string
   updatedAt: string
+}
+
+export interface ExistingCardSummary {
+  title: string
+  oneLiner: string
+  tags: string[]
+  cardType: CardType
 }
 
 export interface CategoryMeta {
@@ -96,6 +104,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { id: 'architecture', name: '建筑学', icon: 'lucide:building-2', color: '#8B7B6B', description: '解读空间、结构与城市之美', cardCount: 0 },
   { id: 'design-thinking', name: '设计思维', icon: 'lucide:pen-tool', color: '#A06080', description: '探索以人为中心的创新方法论', cardCount: 0 },
   { id: 'daily-life', name: '生活常识', icon: 'lucide:coffee', color: '#A08B70', description: '实用生活知识，做个明白人', cardCount: 0 },
+  { id: 'healthy-living', name: '健康生活', icon: 'lucide:heart-pulse', color: '#50A890', description: '用科学守护身体与心理的健康', cardCount: 0 },
 ]
 
 export const DIFFICULTY_LABELS: Record<Difficulty, { label: string; icon: string }> = {

@@ -593,7 +593,7 @@
 </template>
 
 <script setup lang="ts">
-import { CATEGORIES, AI_PROVIDERS, getCategoryMeta, DIFFICULTY_LABELS, CARD_TYPE_LABELS, type AIProvider, type AIConfig } from '~/types'
+import { CATEGORIES, AI_PROVIDERS, getCategoryMeta, DIFFICULTY_LABELS, CARD_TYPE_LABELS, type AIProvider, type AIConfig, type ExistingCardSummary } from '~/types'
 import type { Category, KnowledgeCard, RelatedTopic } from '~/types'
 import type { LearningPath } from '~/types/paths'
 import { getAllCards, insertCard, invalidateCardsCache } from '~/utils/cards'
@@ -918,6 +918,24 @@ async function handleRelatedTopicClick(topic: RelatedTopic) {
   }
 
   try {
+    const allCards = await getAllCards()
+    const existingCards: ExistingCardSummary[] = [
+      ...allCards
+        .filter(c => c.category === selectedCategory.value)
+        .map(c => ({
+          title: c.title,
+          oneLiner: c.oneLiner,
+          tags: c.tags,
+          cardType: c.cardType,
+        })),
+      ...sessionGeneratedTitles.value.map(t => ({
+        title: t,
+        oneLiner: '',
+        tags: [] as string[],
+        cardType: 'concept' as const,
+      })),
+    ]
+
     const res = await $fetch('/api/ai/generate-card', {
       method: 'POST',
       body: {
@@ -925,7 +943,7 @@ async function handleRelatedTopicClick(topic: RelatedTopic) {
         apiKey: activeConfig.value.apiKey,
         model: activeConfig.value.model,
         category: selectedCategory.value,
-        existingCardTitles: sessionGeneratedTitles.value,
+        existingCards,
         topicHint: { title: topic.title, oneLiner: topic.oneLiner },
       },
     })
@@ -998,11 +1016,21 @@ async function startGenerate() {
     invalidateCardsCache()
     if (selectedType.value === 'card') {
       const allCards = await getAllCards()
-      const existingTitles = [
+      const existingCards: ExistingCardSummary[] = [
         ...allCards
           .filter(c => c.category === selectedCategory.value)
-          .map(c => c.title),
-        ...sessionGeneratedTitles.value,
+          .map(c => ({
+            title: c.title,
+            oneLiner: c.oneLiner,
+            tags: c.tags,
+            cardType: c.cardType,
+          })),
+        ...sessionGeneratedTitles.value.map(t => ({
+          title: t,
+          oneLiner: '',
+          tags: [] as string[],
+          cardType: 'concept' as const,
+        })),
       ]
 
       const res = await $fetch('/api/ai/generate-card', {
@@ -1012,7 +1040,7 @@ async function startGenerate() {
           apiKey: activeConfig.value.apiKey,
           model: activeConfig.value.model,
           category: selectedCategory.value,
-          existingCardTitles: existingTitles,
+          existingCards,
         },
       })
 

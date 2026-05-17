@@ -1,5 +1,5 @@
-import { CATEGORIES } from '~/types'
-import type { Category } from '~/types'
+import { CATEGORIES, CARD_TYPE_LABELS } from '~/types'
+import type { Category, CardType, ExistingCardSummary } from '~/types'
 import type { TavilyResult } from '~/types/fact-check'
 
 export function buildQuizPrompt(
@@ -52,13 +52,71 @@ ${diffLabel[difficulty] || '入门（简单回忆知识点）'}
 }`
 }
 
-export function buildCardPrompt(category: Category, existingCardTitles: string[], topicHint?: { title: string; oneLiner: string }): string {
+function buildTagCoverageMap(cards: ExistingCardSummary[]) {
+  const tagCounts = new Map<string, number>()
+  const cardTypeCounts: Partial<Record<CardType, number>> = {}
+
+  for (const card of cards) {
+    for (const tag of card.tags) {
+      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
+    }
+    if (card.cardType) {
+      cardTypeCounts[card.cardType] = (cardTypeCounts[card.cardType] || 0) + 1
+    }
+  }
+
+  const coveredTags = [...tagCounts.entries()]
+    .filter(([, count]) => count >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag]) => tag)
+
+  return { tagCounts, coveredTags, cardTypeCounts }
+}
+
+export function buildCardPrompt(category: Category, existingCards: ExistingCardSummary[], topicHint?: { title: string; oneLiner: string }): string {
   const catMeta = CATEGORIES.find(c => c.id === category)
   const catName = catMeta?.name || category
   const catDesc = catMeta?.description || ''
 
+  // Token control: cap at 30 cards
+  const cardsToAnalyze = existingCards.length > 30 ? existingCards.slice(-30) : existingCards
+
   const topicHintSection = topicHint
     ? `\n## 指定主题（必须围绕此主题生成）\n- 主题: ${topicHint.title}\n- 简介: ${topicHint.oneLiner}\n\n请专门围绕这个具体方向生成卡片，而不是随机选择话题。主题指令优先于"避免重复"规则。`
+    : ''
+
+  // --- Topic coverage analysis ---
+  const coverage = buildTagCoverageMap(cardsToAnalyze)
+
+  const existingCardsList = cardsToAnalyze.length > 0
+    ? cardsToAnalyze.map((c, i) =>
+        `${i + 1}. 「${c.title}」${c.oneLiner ? ' — ' + c.oneLiner : ''} [类型:${CARD_TYPE_LABELS[c.cardType] || c.cardType}] [标签:${c.tags.join('、') || '无'}]`
+      ).join('\n')
+    : '（暂无卡片，这是该分类的第一张）'
+
+  const coveredTagsSection = coverage.coveredTags.length > 0
+    ? `\n### 已充分覆盖的主题标签（优先避开这些方向）\n${coverage.coveredTags.map(t => `- ${t} (${coverage.tagCounts.get(t)}张)`).join('\n')}`
+    : ''
+
+  const usedTypes = Object.entries(coverage.cardTypeCounts)
+    .map(([type, count]) => `${CARD_TYPE_LABELS[type as CardType] || type}: ${count}张`)
+    .join('、')
+  const unusedTypes = (Object.keys(CARD_TYPE_LABELS) as CardType[])
+    .filter(t => !coverage.cardTypeCounts[t])
+    .map(t => CARD_TYPE_LABELS[t])
+    .join('、')
+
+  const typeSection = usedTypes
+    ? `\n### 已有卡片类型分布\n已使用: ${usedTypes}${unusedTypes ? `\n未使用: ${unusedTypes}` : ''}`
+    : ''
+
+  const diversitySection = cardsToAnalyze.length > 0
+    ? `
+## 多样性要求（重要！）
+1. **角度差异化**：新卡片必须从与已有卡片不同的角度切入。已覆盖的方向：${coverage.coveredTags.slice(0, 8).join('、') || '无'}。请探索未被触及的子话题。
+2. **类型多样化**：${unusedTypes ? `优先考虑「${unusedTypes}」类型的卡片。` : '已有类型分布较均匀，选择最适合内容的类型即可。'}
+3. **标签新颖性**：新卡片的 tags 中至少包含一个从未出现过的标签。
+4. **禁止换皮重复**：不要把已有知识点换个说法（如"XX的本质""XX背后的真相""XX的底层逻辑"）当新卡片。`
     : ''
 
   return `你是一个知识科普内容创作专家。请为「万象研究所」知识卡片平台生成一张全新的知识卡片。
@@ -67,8 +125,11 @@ export function buildCardPrompt(category: Category, existingCardTitles: string[]
 - 分类: ${catName} (${category})
 - 描述: ${catDesc}
 ${topicHintSection}
-## 已有卡片标题（请勿重复）
-${existingCardTitles.length > 0 ? existingCardTitles.map((t, i) => `${i + 1}. ${t}`).join('\n') : '（暂无卡片）'}
+## 已有卡片及覆盖情况
+${existingCardsList}
+${coveredTagsSection}
+${typeSection}
+${diversitySection}
 
 ## 内容结构规范（必须严格遵循以下六步结构）
 
@@ -124,7 +185,7 @@ ${existingCardTitles.length > 0 ? existingCardTitles.map((t, i) => `${i + 1}. ${
 4. content 中的六个 ## 标题必须使用上面指定的固定标题，不要自创标题
 5. keyData 提供 2-4 个核心数据点，数据要真实可信
 6. references 提供 1-3 个参考来源
-7. 避免与已有卡片主题重复`
+7. 新卡片必须与已有卡片形成互补，覆盖不同的子话题或角度`
 }
 
 export function buildPathPrompt(category: Category, existingPaths: string[], existingCards: {id: string, title: string, oneLiner: string}[]): string {

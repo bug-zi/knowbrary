@@ -170,7 +170,7 @@ function parseInsertSQL(sql) {
 }
 
 async function deploy() {
-  const batches = ['seed_batch1.sql', 'seed_batch2.sql', 'seed_batch3.sql', 'seed_batch4.sql'];
+  const batches = ['seed_batch1.sql', 'seed_batch2.sql', 'seed_batch3.sql', 'seed_batch4.sql', 'seed_batch5.sql', 'seed_batch6.sql'];
   let totalInserted = 0;
   let totalFailed = 0;
 

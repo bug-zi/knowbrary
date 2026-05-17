@@ -56,6 +56,7 @@ export default {
           architecture: '#8B7B6B',
           'design-thinking': '#A06080',
           'daily-life': '#A08B70',
+          'healthy-living': '#50A890',
         },
       },
       fontFamily: {
