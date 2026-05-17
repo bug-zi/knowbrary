@@ -26,17 +26,6 @@
           </span>
 
           <div class="flex items-center gap-0.5">
-            <button
-              class="p-1.5 rounded-lg hover:bg-macaron-hover-bg transition-colors"
-              @click="handleFavorite"
-              :aria-label="isFav ? '取消收藏' : '收藏'"
-            >
-              <Icon
-                name="lucide:star"
-                class="w-4 h-4"
-                :class="isFav ? 'text-macaron-cta' : 'text-macaron-muted'"
-                :style="isFav ? 'fill: var(--macaron-cta)' : ''"
-              />
             </button>
             <button
               v-if="card && card.id.startsWith('ai-')"
@@ -245,7 +234,7 @@
         </div>
       </div>
 
-      <!-- Learning completion overlay -->
+      <!-- Review completion overlay -->
       <Transition name="completion">
         <div
           v-if="card && showCompletion"
@@ -258,33 +247,24 @@
                 <Icon name="lucide:sparkles" class="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 class="text-base font-bold text-macaron-text">学习完成</h3>
-                <p class="text-xs text-macaron-text-secondary">你已阅读完「{{ card.title }}」的所有内容</p>
+                <h3 class="text-base font-bold text-macaron-text">复习完成</h3>
+                <p class="text-xs text-macaron-text-secondary">你已复习完「{{ card.title }}」的所有内容</p>
               </div>
             </div>
             <div class="flex gap-2.5 mt-4">
               <button
-                class="flex-1 py-2.5 rounded-xl font-medium text-sm border border-macaron-border text-macaron-text hover:bg-macaron-hover-bg transition-all duration-200 active:scale-[0.97]"
+                class="flex-1 py-2.5 rounded-xl font-medium text-sm border border-macaron-border text-macaron-text hover:bg-macaron-hover-bg transition-all duration-200 active:scale-[0.97] cursor-pointer"
                 @click="handleArchive"
               >
                 <Icon name="lucide:archive" class="inline w-3.5 h-3.5 align-text-bottom mr-1" />
                 归档
               </button>
               <button
-                class="flex-1 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 active:scale-[0.97]"
-                :class="isFav ? 'text-white' : 'text-white'"
-                :style="{ background: isFav ? '#BCAAA4' : 'linear-gradient(135deg, #D4A574, #C49A6C)' }"
-                @click="handleFavoriteAndClose"
-              >
-                <Icon name="lucide:star" class="inline w-3.5 h-3.5 align-text-bottom mr-1" :style="isFav ? 'fill: white' : ''" />
-                {{ isFav ? '已收藏' : '收藏' }}
-              </button>
-              <button
-                class="flex-1 py-2.5 rounded-xl font-medium text-sm border border-macaron-border text-macaron-text hover:bg-macaron-hover-bg transition-all duration-200 active:scale-[0.97]"
+                class="flex-1 py-2.5 rounded-xl font-medium text-sm border border-macaron-border text-macaron-text hover:bg-macaron-hover-bg transition-all duration-200 active:scale-[0.97] cursor-pointer"
                 @click="handleRelearn"
               >
                 <Icon name="lucide:rotate-ccw" class="inline w-3.5 h-3.5 align-text-bottom mr-1" />
-                重新学习
+                重新复习
               </button>
             </div>
           </div>
