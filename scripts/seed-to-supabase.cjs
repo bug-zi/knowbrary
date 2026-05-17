@@ -169,8 +169,31 @@ function parseInsertSQL(sql) {
   return cards;
 }
 
+// Parse categories INSERT from SQL
+function parseCategoriesSQL(sql) {
+  const categories = [];
+  const lines = sql.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('(') || trimmed.startsWith('--')) continue;
+    // Match tuple: ('id', 'name', 'icon', 'color', 'desc', sort_order)
+    const m = trimmed.match(/^\('([^']+)',\s*'([^']+)',\s*'([^']+)',\s*'([^']+)',\s*'([^']+)',\s*(\d+)\)/);
+    if (m) {
+      categories.push({
+        id: m[1],
+        name: m[2],
+        icon: m[3],
+        color: m[4],
+        description: m[5],
+        sort_order: parseInt(m[6]),
+      });
+    }
+  }
+  return categories;
+}
+
 async function deploy() {
-  const batches = ['seed_batch1.sql', 'seed_batch2.sql', 'seed_batch3.sql', 'seed_batch4.sql', 'seed_batch5.sql', 'seed_batch6.sql'];
+  const batches = ['seed_batch1.sql', 'seed_batch2.sql', 'seed_batch3.sql', 'seed_batch4.sql', 'seed_batch5.sql', 'seed_batch6.sql', 'seed_batch7.sql'];
   let totalInserted = 0;
   let totalFailed = 0;
 
@@ -182,11 +205,25 @@ async function deploy() {
     }
 
     const sql = fs.readFileSync(filePath, 'utf8');
+
+    // First, sync categories from this batch
+    const categories = parseCategoriesSQL(sql);
+    if (categories.length > 0) {
+      for (const cat of categories) {
+        const { error: catErr } = await sb.from('categories').upsert(cat, { onConflict: 'id' });
+        if (catErr) {
+          console.error(`  CATEGORY UPSERT FAILED ${cat.id}:`, catErr.message);
+        } else {
+          console.log(`  Category synced: ${cat.id} (${cat.name})`);
+        }
+      }
+    }
+
     const cards = parseInsertSQL(sql);
-    console.log(`\n=== ${batch}: Parsed ${cards.length} cards ===`);
+    console.log(`\n=== ${batch}: Parsed ${cards.length} cards, ${categories.length} categories ===`);
 
     if (cards.length === 0) {
-      console.log('  No cards parsed, skipping');
+      console.log('  No cards parsed, skipping card insert');
       continue;
     }
 
