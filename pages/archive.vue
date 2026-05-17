@@ -63,15 +63,24 @@
 </template>
 
 <script setup lang="ts">
-import { getArchivedCards, unarchiveCard, permanentlyDeleteCard, getRemainingDays } from '~/utils/archive'
+import { getArchivedCards, unarchiveCard, removeArchiveEntry, getRemainingDays } from '~/utils/archive'
+import { deleteCard, invalidateCardsCache } from '~/utils/cards'
 import { getCategoryMeta } from '~/types'
 import type { ArchivedCard } from '~/utils/archive'
 
 const archivedCards = ref<ArchivedCard[]>([])
-const refreshKey = ref(0)
 
-onMounted(() => {
-  archivedCards.value = getArchivedCards()
+onMounted(async () => {
+  const { valid, expired } = getArchivedCards()
+  archivedCards.value = valid
+
+  // Cleanup expired AI-generated cards from database
+  for (const item of expired) {
+    if (item.id.startsWith('ai-')) {
+      deleteCard(item.id).catch(() => {})
+    }
+  }
+  if (expired.length > 0) invalidateCardsCache()
 })
 
 function getMeta(category: string) {
@@ -80,12 +89,17 @@ function getMeta(category: string) {
 
 function handleRestore(cardId: string) {
   unarchiveCard(cardId)
-  archivedCards.value = getArchivedCards()
+  invalidateCardsCache()
+  archivedCards.value = getArchivedCards().valid
 }
 
 async function handlePermanentDelete(cardId: string) {
   if (!confirm('永久删除后将无法恢复，确定吗？')) return
-  await permanentlyDeleteCard(cardId)
-  archivedCards.value = getArchivedCards()
+  removeArchiveEntry(cardId)
+  if (cardId.startsWith('ai-')) {
+    await deleteCard(cardId)
+  }
+  invalidateCardsCache()
+  archivedCards.value = getArchivedCards().valid
 }
 </script>

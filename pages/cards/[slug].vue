@@ -319,7 +319,7 @@
 </template>
 
 <script setup lang="ts">
-import { getCardBySlug, getRelatedCards, deleteCard } from '~/utils/cards'
+import { getCardBySlug, getRelatedCards, deleteCard, invalidateCardsCache } from '~/utils/cards'
 import { getCategoryMeta, DIFFICULTY_LABELS, CARD_TYPE_LABELS } from '~/types'
 import { isFavorite, toggleFavorite } from '~/utils/favorites'
 import { markCardLearned, isCardLearned } from '~/utils/progress'
@@ -369,6 +369,7 @@ function showToast(text: string) {
 function handleArchive() {
   if (!card) return
   archiveCard({ id: card.id, title: card.title, category: card.category })
+  invalidateCardsCache()
   showCompletion.value = false
   showToast('已归档，7天后将自动删除')
   setTimeout(() => navigateTo(backTo), 800)

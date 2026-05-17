@@ -19,57 +19,32 @@ function writeList(list: ArchivedCard[]) {
   localStorage.setItem(ARCHIVE_KEY, JSON.stringify(list))
 }
 
-function cleanupExpired(list: ArchivedCard[]): ArchivedCard[] {
+export function getArchivedCards(): { valid: ArchivedCard[]; expired: ArchivedCard[] } {
+  const list = readList()
   const now = Date.now()
-  const [valid, expired] = list.reduce(
-    (acc, item) => {
-      acc[now - item.archivedAt >= EXPIRY_MS ? 1 : 0].push(item)
-      return acc
-    },
-    [[], []] as [ArchivedCard[], ArchivedCard[]]
-  )
-
-  if (expired.length > 0) {
-    writeList(valid)
-    // Fire-and-forget: delete expired AI-generated cards from database
-    import('~/utils/cards').then(({ deleteCard, invalidateCardsCache }) => {
-      for (const item of expired) {
-        if (item.id.startsWith('ai-')) {
-          deleteCard(item.id).catch(() => {})
-        }
-      }
-      invalidateCardsCache()
-    })
+  const valid: ArchivedCard[] = []
+  const expired: ArchivedCard[] = []
+  for (const item of list) {
+    if (now - item.archivedAt >= EXPIRY_MS) expired.push(item)
+    else valid.push(item)
   }
-
-  return valid
-}
-
-export function getArchivedCards(): ArchivedCard[] {
-  return cleanupExpired(readList())
+  if (valid.length !== list.length) writeList(valid)
+  return { valid, expired }
 }
 
 export function getArchivedCardIds(): string[] {
-  return getArchivedCards().map(c => c.id)
+  return getArchivedCards().valid.map(c => c.id)
 }
 
 export function archiveCard(card: { id: string; title: string; category: string }) {
   const list = readList()
   if (list.some(c => c.id === card.id)) return
-  list.push({
-    id: card.id,
-    title: card.title,
-    category: card.category,
-    archivedAt: Date.now(),
-  })
+  list.push({ id: card.id, title: card.title, category: card.category, archivedAt: Date.now() })
   writeList(list)
-  invalidateCardsCache()
 }
 
 export function unarchiveCard(cardId: string) {
-  const list = readList().filter(c => c.id !== cardId)
-  writeList(list)
-  invalidateCardsCache()
+  writeList(readList().filter(c => c.id !== cardId))
 }
 
 export function isArchived(cardId: string): boolean {
@@ -78,21 +53,10 @@ export function isArchived(cardId: string): boolean {
 }
 
 export function getRemainingDays(archivedAt: number): number {
-  const elapsed = Date.now() - archivedAt
-  const remaining = EXPIRY_MS - elapsed
+  const remaining = EXPIRY_MS - (Date.now() - archivedAt)
   return Math.max(0, Math.ceil(remaining / (24 * 60 * 60 * 1000)))
 }
 
-export async function permanentlyDeleteCard(cardId: string) {
-  const list = readList().filter(c => c.id !== cardId)
-  writeList(list)
-  if (cardId.startsWith('ai-')) {
-    const { deleteCard } = await import('~/utils/cards')
-    await deleteCard(cardId)
-  }
-  invalidateCardsCache()
-}
-
-function invalidateCardsCache() {
-  import('~/utils/cards').then(({ invalidateCardsCache: inv }) => inv())
+export function removeArchiveEntry(cardId: string) {
+  writeList(readList().filter(c => c.id !== cardId))
 }
