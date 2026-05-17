@@ -109,9 +109,9 @@ const providerName = computed(() => {
 
 // Load active AI config
 const { syncFromSupabase } = useAiConfig()
+const user = useSupabaseUser()
 
 async function loadActiveConfig() {
-  const user = useSupabaseUser()
   if (!user.value) { activeConfig.value = null; return }
   const { data } = await client
     .from('ai_configs')
@@ -132,8 +132,18 @@ async function loadHistory() {
   history.value = await fetchHistoryFromSupabase()
 }
 
+// Watch user so config loads once auth session is ready
+watch(user, (u) => {
+  if (u) {
+    loadActiveConfig()
+    syncFromSupabase()
+  }
+}, { immediate: true })
+
 onMounted(async () => {
-  await Promise.all([loadActiveConfig(), syncFromSupabase()])
+  if (user.value) {
+    await Promise.all([loadActiveConfig(), syncFromSupabase()])
+  }
   await loadHistory()
 })
 
