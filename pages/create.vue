@@ -598,6 +598,7 @@ import type { Category, KnowledgeCard, RelatedTopic } from '~/types'
 import type { LearningPath } from '~/types/paths'
 import { getAllCards, insertCard, invalidateCardsCache } from '~/utils/cards'
 import { insertPath } from '~/utils/paths'
+import { markCardLearned } from '~/utils/progress'
 
 definePageMeta({ layout: 'default' })
 
@@ -988,6 +989,7 @@ async function handleAddToLibrary() {
       showToast(`保存失败: ${result.error}`, false)
       return
     }
+    if (card.id) markCardLearned(card.id)
     showToast('已添加到知识库')
     // Transition to step 2: deep learning + extended learning
     completionStep.value = 2
@@ -1087,6 +1089,7 @@ async function saveResult() {
         showToast(`保存失败: ${result.error}`, false)
         return
       }
+      if (card.id) markCardLearned(card.id)
       showToast('知识卡片已保存！')
     } else if (selectedType.value === 'path' && generatedPath.value) {
       const path = generatedPath.value as LearningPath

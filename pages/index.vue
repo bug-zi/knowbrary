@@ -71,14 +71,14 @@
     <template v-if="showRecommendations">
       <div class="relative max-w-5xl mx-auto px-4 space-y-8 mt-4" style="z-index: 1;">
 
-        <!-- Personalized: 猜你想学 -->
+        <!-- Personalized: 推荐复习 -->
         <section v-if="personalizedCards.length > 0">
           <div class="flex items-center gap-2.5 mb-4">
             <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-macaron-cta/10">
               <Icon name="lucide:sparkles" class="w-4 h-4 text-macaron-cta" />
             </div>
             <div>
-              <h2 class="text-lg font-bold text-macaron-text">猜你想学</h2>
+              <h2 class="text-lg font-bold text-macaron-text">推荐复习</h2>
               <p class="text-xs text-macaron-text-secondary">基于你的兴趣标签智能推荐</p>
             </div>
           </div>
@@ -118,29 +118,28 @@
             </div>
             <div>
               <h2 class="text-lg font-bold text-macaron-text">探索新领域</h2>
-              <p class="text-xs text-macaron-text-secondary">你还没涉足的学科方向</p>
+              <p class="text-xs text-macaron-text-secondary">这些方向卡片还不多，去创作吧</p>
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <NuxtLink
-              v-for="card in exploreCards"
-              :key="card.id"
-              :to="`/cards/${card.slug}`"
+              v-for="exp in exploreCards"
+              :key="exp.category"
+              :to="`/categories/${exp.category}`"
               class="group p-4 rounded-2xl bg-macaron-card/80 backdrop-blur-sm border border-macaron-border/40 hover:border-emerald-400/30 hover:shadow-lg hover:shadow-emerald-400/5 transition-all duration-300 no-underline"
             >
               <div class="flex items-center gap-3">
                 <div
                   class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  :style="{ backgroundColor: getCategoryMeta(card.category).color + '18' }"
+                  :style="{ backgroundColor: getCategoryMeta(exp.category).color + '18' }"
                 >
-                  <Icon :name="getCategoryMeta(card.category).icon" class="w-5 h-5" :style="{ color: getCategoryMeta(card.category).color }" />
+                  <Icon :name="getCategoryMeta(exp.category).icon" class="w-5 h-5" :style="{ color: getCategoryMeta(exp.category).color }" />
                 </div>
                 <div class="min-w-0 flex-1">
-                  <div class="text-[11px] font-medium mb-0.5" :style="{ color: getCategoryMeta(card.category).color }">
-                    {{ getCategoryMeta(card.category).name }}
+                  <div class="text-[11px] font-medium mb-0.5" :style="{ color: getCategoryMeta(exp.category).color }">
+                    {{ exp.name }}
                   </div>
-                  <h3 class="text-sm font-semibold text-macaron-text group-hover:text-emerald-600 transition-colors truncate">{{ card.title }}</h3>
-                  <p class="text-xs text-macaron-text-secondary mt-0.5 line-clamp-1">{{ card.oneLiner }}</p>
+                  <h3 class="text-sm font-semibold text-macaron-text group-hover:text-emerald-600 transition-colors">已有 {{ exp.cardCount }} 张卡片</h3>
                 </div>
                 <Icon name="lucide:chevron-right" class="w-4 h-4 text-macaron-muted shrink-0 group-hover:text-emerald-600 transition-colors" />
               </div>
@@ -209,7 +208,7 @@
 <script setup lang="ts">
 import { getAllCards } from '~/utils/cards'
 import { getCategoryMeta } from '~/types'
-import type { KnowledgeCard, InterestProfile } from '~/types'
+import type { KnowledgeCard, InterestProfile, Category } from '~/types'
 
 useHead({
   bodyAttrs: { style: 'background-color: transparent' },
@@ -229,12 +228,12 @@ function exploreRandom() {
 const { getPersonalizedCards, getExploreCards, getUserInterestProfile, hasUserData } = useRecommendation()
 
 const personalizedCards = ref<KnowledgeCard[]>([])
-const exploreCards = ref<KnowledgeCard[]>([])
+const exploreCards = ref<{ category: Category; name: string; cardCount: number }[]>([])
 const interestProfile = ref<InterestProfile | null>(null)
 const showRecommendations = ref(false)
 
 onMounted(async () => {
-  if (!hasUserData()) return
+  if (cards.length === 0) return
   showRecommendations.value = true
   const [personalized, explore, profile] = await Promise.all([
     getPersonalizedCards(6),

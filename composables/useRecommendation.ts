@@ -87,96 +87,93 @@ export function useRecommendation() {
   }
 
   /**
-   * Strategy 2: Interest-based tag matching
-   * Score unlearned cards by how well their tags match the user's interest profile.
+   * Strategy 2: Review recommendations
+   * All cards in the app are created by the user, so they're all "learned".
+   * This recommends cards for REVIEW based on interest relevance and diversity.
    */
   async function getPersonalizedCards(limit = 6): Promise<KnowledgeCard[]> {
     const cards = await ensureCards()
     const favoriteIds = new Set(getFavorites())
-    const learned = new Set(getLearnedCardIds())
 
-    if (favoriteIds.size === 0 && learned.size === 0) return []
+    if (cards.length === 0) return []
 
-    // Build interest tag scores
+    // Build interest tag scores from favorites (favorites = strong interest signal)
     const tagScores = new Map<string, number>()
     for (const card of cards) {
       const isFav = favoriteIds.has(card.id)
-      const isLearned = learned.has(card.id)
-      if (!isFav && !isLearned) continue
-      const weight = isFav ? 3 : 1
+      if (!isFav) continue
       for (const tag of card.tags) {
-        tagScores.set(tag, (tagScores.get(tag) || 0) + weight)
+        tagScores.set(tag, (tagScores.get(tag) || 0) + 3)
       }
     }
 
-    // Score unlearned, non-favorite cards
+    // Score all cards by interest relevance (for review priority)
     const scored = cards
-      .filter(c => !learned.has(c.id) && !favoriteIds.has(c.id))
       .map(c => ({
         card: c,
         score: c.tags.reduce((sum, t) => sum + (tagScores.get(t) || 0), 0),
       }))
-      .filter(x => x.score > 0)
       .sort((a, b) => b.score - a.score)
 
-    // Diversify: avoid too many from same category
+    // Diversify: max 2 per category
     const catCount = new Map<string, number>()
     const result: KnowledgeCard[] = []
     for (const { card } of scored) {
       const catN = catCount.get(card.category) || 0
-      if (catN >= 2) continue // max 2 per category
+      if (catN >= 2) continue
       catCount.set(card.category, catN + 1)
       result.push(card)
       if (result.length >= limit) break
+    }
+
+    // If not enough scored cards (no favorites yet), pick random diverse cards
+    if (result.length < limit) {
+      const existingIds = new Set(result.map(c => c.id))
+      const remaining = cards.filter(c => !existingIds.has(c.id))
+      // Shuffle and add
+      for (let i = remaining.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [remaining[i], remaining[j]] = [remaining[j], remaining[i]]
+      }
+      for (const c of remaining) {
+        const catN = catCount.get(c.category) || 0
+        if (catN >= 2) continue
+        catCount.set(c.category, catN + 1)
+        result.push(c)
+        if (result.length >= limit) break
+      }
     }
 
     return result
   }
 
   /**
-   * Strategy 3: Explore unvisited categories
+   * Strategy 3: Suggest creation directions
+   * Find categories where the user has few cards, suggesting areas to explore
+   * by creating new cards.
    */
-  async function getExploreCards(limit = 4): Promise<KnowledgeCard[]> {
+  async function getExploreCards(limit = 4): Promise<{ category: Category; name: string; cardCount: number }[]> {
     const cards = await ensureCards()
-    const learned = new Set(getLearnedCardIds())
-    const favorites = new Set(getFavorites())
 
-    if (learned.size === 0 && favorites.size === 0) return []
+    if (cards.length === 0) return []
 
-    // Find user's visited categories
-    const visitedCats = new Set<string>()
+    // Count cards per category
+    const catCounts = new Map<string, number>()
     for (const card of cards) {
-      if (learned.has(card.id) || favorites.has(card.id)) {
-        visitedCats.add(card.category)
-      }
+      catCounts.set(card.category, (catCounts.get(card.category) || 0) + 1)
     }
 
-    // Find unvisited categories
-    const unvisitedCards = cards.filter(c => !visitedCats.has(c.category) && !learned.has(c.id))
-    if (unvisitedCards.length === 0) return []
+    // Suggest categories with fewest cards (most room to explore)
+    const suggestions = [...catCounts.entries()]
+      .sort((a, b) => a[1] - b[1])
+      .slice(0, limit)
+      .map(([category, cardCount]) => ({
+        category: category as Category,
+        name: getCategoryMeta(category as Category).name,
+        cardCount,
+      }))
 
-    // Pick top cards from different unvisited categories
-    const catCards = new Map<string, KnowledgeCard[]>()
-    for (const card of unvisitedCards) {
-      const list = catCards.get(card.category) || []
-      list.push(card)
-      catCards.set(card.category, list)
-    }
-
-    const result: KnowledgeCard[] = []
-    const categories = [...catCards.keys()]
-    // Rotate through categories to diversify
-    let idx = 0
-    while (result.length < limit && categories.some(c => (catCards.get(c)?.length || 0) > 0)) {
-      const cat = categories[idx % categories.length]
-      const list = catCards.get(cat)
-      if (list && list.length > 0) {
-        result.push(list.shift()!)
-      }
-      idx++
-    }
-
-    return result
+    return suggestions
   }
 
   /**
