@@ -16,6 +16,11 @@
       </NuxtLink>
     </div>
 
+    <!-- Tier Progress (only for domains with progressive learning enabled) -->
+    <div v-if="tierStatus" class="mb-4">
+      <DomainTierProgressBar :status="tierStatus" :category-id="category" :intermediate-hint="intermediateHint" :advanced-hint="advancedHint" />
+    </div>
+
     <!-- Filters (sticky on scroll) -->
     <div class="sticky top-[3.5rem] z-10 -mx-4 px-4 py-2 bg-macaron-bg/90 backdrop-blur-sm border-b border-macaron-border/30 mb-4 flex items-center gap-2 flex-wrap">
       <button
@@ -53,6 +58,9 @@
 import { getCardsByCategory, filterCards } from '~/utils/cards'
 import { getCategoryMeta, DIFFICULTY_LABELS, CARD_TYPE_LABELS } from '~/types'
 import type { Category, Difficulty, CardType } from '~/types'
+import { getDomainTierConfig, computeTierStatus, getUnlockRequirement } from '~/utils/domain-tiers'
+import type { TierStatus } from '~/types/domain-tiers'
+import { getLearnedCardIds } from '~/utils/progress'
 
 const route = useRoute()
 const category = route.params.category as Category
@@ -74,6 +82,16 @@ const cardTypes = Object.entries(CARD_TYPE_LABELS).map(([value, label]) => ({
 
 const { data: categoryCards, refresh: refreshCards } = await useAsyncData(`category-${category}-cards`, () => getCardsByCategory(category))
 const cards = computed(() => categoryCards.value ?? [])
+
+// Domain tier system
+const tierConfig = getDomainTierConfig(category)
+const tierStatus = computed<TierStatus | null>(() => {
+  if (!tierConfig) return null
+  const learnedIds = getLearnedCardIds()
+  return computeTierStatus(learnedIds, cards.value, tierConfig)
+})
+const intermediateHint = tierConfig ? getUnlockRequirement(tierConfig, 'intermediate') ?? '' : ''
+const advancedHint = tierConfig ? getUnlockRequirement(tierConfig, 'advanced') ?? '' : ''
 
 const filteredCards = computed(() => {
   let result = cards.value

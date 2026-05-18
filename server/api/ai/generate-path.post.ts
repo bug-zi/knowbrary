@@ -1,5 +1,6 @@
-import type { AIProvider } from '~/types'
-import { buildPathPrompt } from '~/utils/ai-prompts'
+import type { AIProvider, Difficulty } from '~/types'
+import { buildPathPrompt, buildProgressivePathPrompt } from '~/utils/ai-prompts'
+import { getDomainTierConfig } from '~/utils/domain-tiers'
 import type { Category } from '~/types'
 
 const PROVIDER_URLS: Record<AIProvider, string> = {
@@ -12,13 +13,15 @@ const PROVIDER_URLS: Record<AIProvider, string> = {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { provider, apiKey, model, category, existingPaths, existingCards } = body as {
+  const { provider, apiKey, model, category, existingPaths, existingCards, targetDifficulty, prerequisiteCardTitles } = body as {
     provider: AIProvider
     apiKey: string
     model: string
     category: Category
     existingPaths: string[]
-    existingCards: {id: string, title: string, oneLiner: string}[]
+    existingCards: {id: string, title: string, oneLiner: string, difficulty?: string}[]
+    targetDifficulty?: Difficulty
+    prerequisiteCardTitles?: string[]
   }
 
   if (!provider || !apiKey || !model || !category) {
@@ -30,7 +33,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: `Invalid provider: ${provider}` })
   }
 
-  const prompt = buildPathPrompt(category, existingPaths || [], existingCards || [])
+  // Use progressive prompt if targetDifficulty is specified and domain supports tiers
+  const tierConfig = getDomainTierConfig(category)
+  const useProgressive = targetDifficulty && tierConfig
+
+  const prompt = useProgressive
+    ? buildProgressivePathPrompt(category, targetDifficulty, existingPaths || [], existingCards || [], prerequisiteCardTitles || [])
+    : buildPathPrompt(category, existingPaths || [], existingCards || [])
 
   const resp = await fetch(url, {
     method: 'POST',

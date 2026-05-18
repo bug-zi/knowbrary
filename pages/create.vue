@@ -145,6 +145,27 @@
             <div class="text-[11px] font-medium text-macaron-text truncate leading-tight">{{ cat.name }}</div>
           </button>
         </div>
+        <!-- Progressive difficulty selector (only for tier-enabled domains) -->
+        <div v-if="selectedCategoryTierConfig" class="space-y-2">
+          <div class="flex items-center gap-2">
+            <Icon name="lucide:layers" class="w-4 h-4 text-macaron-cta" />
+            <span class="text-sm font-medium text-macaron-text">目标难度</span>
+          </div>
+          <div class="flex gap-2">
+            <button
+              v-for="opt in difficultyOptions"
+              :key="opt.value"
+              class="flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-all duration-200 cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
+              :class="targetDifficulty === opt.value
+                ? 'border-macaron-cta bg-macaron-cta/10 text-macaron-cta'
+                : 'border-macaron-border/50 bg-macaron-card text-macaron-text-secondary hover:border-macaron-cta/30'"
+              @click="targetDifficulty = opt.value"
+            >
+              <Icon :name="opt.icon" class="w-3.5 h-3.5" />
+              {{ opt.label }}
+            </button>
+          </div>
+        </div>
         <button
           class="w-full py-3.5 rounded-2xl text-white font-semibold text-sm transition-all duration-300 cursor-pointer"
           :class="selectedCategory
@@ -593,11 +614,12 @@
 
 <script setup lang="ts">
 import { CATEGORIES, AI_PROVIDERS, getCategoryMeta, DIFFICULTY_LABELS, CARD_TYPE_LABELS, type AIProvider, type AIConfig, type ExistingCardSummary } from '~/types'
-import type { Category, KnowledgeCard, RelatedTopic } from '~/types'
+import type { Category, KnowledgeCard, RelatedTopic, Difficulty } from '~/types'
 import type { LearningPath } from '~/types/paths'
 import { getAllCards, insertCard, invalidateCardsCache } from '~/utils/cards'
 import { insertPath } from '~/utils/paths'
-import { markCardLearned } from '~/utils/progress'
+import { markCardLearned, getLearnedCardIds } from '~/utils/progress'
+import { getDomainTierConfig, computeTierStatus } from '~/utils/domain-tiers'
 
 definePageMeta({ layout: 'default' })
 
@@ -620,6 +642,7 @@ const generateError = ref('')
 const activeConfig = ref<{ provider: AIProvider; apiKey: string; model: string } | null>(null)
 const generatedCard = ref<any>(null)
 const generatedPath = ref<any>(null)
+const targetDifficulty = ref<Difficulty | null>(null)
 const previewSlide = ref(0)
 const previewSlideContainer = ref<HTMLElement | null>(null)
 const showPreviewCompletion = ref(false)
@@ -638,6 +661,17 @@ const providerName = computed(() => {
   if (!activeConfig.value) return ''
   return AI_PROVIDERS[activeConfig.value.provider]?.name || activeConfig.value.provider
 })
+
+// Progressive learning: check if selected category supports tiers
+const selectedCategoryTierConfig = computed(() =>
+  selectedCategory.value ? getDomainTierConfig(selectedCategory.value) : null,
+)
+
+const difficultyOptions: { value: Difficulty; label: string; icon: string }[] = [
+  { value: 'beginner', label: '入门', icon: 'lucide:lightbulb' },
+  { value: 'intermediate', label: '进阶', icon: 'lucide:microscope' },
+  { value: 'advanced', label: '专业', icon: 'lucide:bar-chart-3' },
+]
 
 // Load active AI config from Supabase
 const { syncFromSupabase } = useAiConfig()
@@ -1033,6 +1067,7 @@ async function startGenerate() {
             oneLiner: c.oneLiner,
             tags: c.tags,
             cardType: c.cardType,
+            difficulty: c.difficulty,
           })),
         ...sessionGeneratedTitles.value.map(t => ({
           title: t,
@@ -1042,6 +1077,18 @@ async function startGenerate() {
         })),
       ]
 
+      // Build prerequisite knowledge from lower-tier cards for progressive generation
+      const prerequisiteKnowledge = selectedCategoryTierConfig.value && targetDifficulty.value
+        ? allCards
+            .filter(c => {
+              if (c.category !== selectedCategory.value) return false
+              if (targetDifficulty.value === 'intermediate') return c.difficulty === 'beginner'
+              if (targetDifficulty.value === 'advanced') return c.difficulty === 'intermediate' || c.difficulty === 'beginner'
+              return false
+            })
+            .map(c => c.title)
+        : []
+
       const res = await $fetch('/api/ai/generate-card', {
         method: 'POST',
         body: {
@@ -1050,6 +1097,10 @@ async function startGenerate() {
           model: activeConfig.value.model,
           category: selectedCategory.value,
           existingCards,
+          ...(selectedCategoryTierConfig.value && targetDifficulty.value ? {
+            targetDifficulty: targetDifficulty.value,
+            prerequisiteKnowledge,
+          } : {}),
         },
       })
 
@@ -1061,7 +1112,19 @@ async function startGenerate() {
       const allCards = await getAllCards()
       const categoryCards = allCards
         .filter(c => c.category === selectedCategory.value)
-        .map(c => ({ id: c.id, title: c.title, oneLiner: c.oneLiner }))
+        .map(c => ({ id: c.id, title: c.title, oneLiner: c.oneLiner, difficulty: c.difficulty }))
+
+      // Build prerequisite card titles for progressive path generation
+      const prerequisiteCardTitles = selectedCategoryTierConfig.value && targetDifficulty.value
+        ? allCards
+            .filter(c => {
+              if (c.category !== selectedCategory.value) return false
+              if (targetDifficulty.value === 'intermediate') return c.difficulty === 'beginner'
+              if (targetDifficulty.value === 'advanced') return c.difficulty === 'intermediate' || c.difficulty === 'beginner'
+              return false
+            })
+            .map(c => c.title)
+        : []
 
       const res = await $fetch('/api/ai/generate-path', {
         method: 'POST',
@@ -1072,6 +1135,10 @@ async function startGenerate() {
           category: selectedCategory.value,
           existingPaths: [],
           existingCards: categoryCards,
+          ...(selectedCategoryTierConfig.value && targetDifficulty.value ? {
+            targetDifficulty: targetDifficulty.value,
+            prerequisiteCardTitles,
+          } : {}),
         },
       })
 

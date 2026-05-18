@@ -1,5 +1,5 @@
 import { CATEGORIES, CARD_TYPE_LABELS } from '~/types'
-import type { Category, CardType, ExistingCardSummary } from '~/types'
+import type { Category, CardType, Difficulty, ExistingCardSummary } from '~/types'
 import type { TavilyResult } from '~/types/fact-check'
 
 export function buildQuizPrompt(
@@ -186,6 +186,207 @@ ${diversitySection}
 5. keyData 提供 2-4 个核心数据点，数据要真实可信
 6. references 提供 1-3 个参考来源
 7. 新卡片必须与已有卡片形成互补，覆盖不同的子话题或角度`
+}
+
+export function buildProgressiveCardPrompt(
+  category: Category,
+  targetDifficulty: Difficulty,
+  existingCards: ExistingCardSummary[],
+  prerequisiteKnowledge: string[] = [],
+  topicHint?: { title: string; oneLiner: string },
+): string {
+  const catMeta = CATEGORIES.find(c => c.id === category)
+  const catName = catMeta?.name || category
+  const catDesc = catMeta?.description || ''
+
+  const diffInstruction: Record<Difficulty, string> = {
+    beginner: `## 难度要求：入门级（beginner）
+- 假设读者完全没有技术背景，对"${catName}"领域一无所知
+- 只使用日常比喻和生活中的例子来解释概念
+- 避免使用任何专业术语（如果必须用，必须立即用通俗语言解释）
+- 目标：让一个路人读完能产生"哦原来是这样"的感觉`,
+
+    intermediate: `## 难度要求：进阶级（intermediate）
+- 假设读者已经理解以下基础概念：${prerequisiteKnowledge.length > 0 ? prerequisiteKnowledge.map(t => `「${t}」`).join('、') : '该领域的基础知识'}
+- 在这些基础之上展开，不要重复入门级内容
+- 可以引入技术术语，但首次出现时必须给出通俗定义
+- 目标：让有基础的读者理解"为什么会这样"的机制，建立技术直觉`,
+
+    advanced: `## 难度要求：专业级（advanced）
+- 假设读者已掌握进阶概念：${prerequisiteKnowledge.length > 0 ? prerequisiteKnowledge.map(t => `「${t}」`).join('、') : '该领域的技术基础'}
+- 直接使用专业术语，不需要逐一解释基础概念
+- 侧重于：实践方法论、工具使用、工程权衡、行业标准
+- 目标：让专业学习者获得可以直接应用的知识和技能`,
+  }
+
+  const cardsToAnalyze = existingCards.length > 30 ? existingCards.slice(-30) : existingCards
+  const coverage = buildTagCoverageMap(cardsToAnalyze)
+
+  const existingCardsList = cardsToAnalyze.length > 0
+    ? cardsToAnalyze.map((c, i) =>
+        `${i + 1}. 「${c.title}」${c.oneLiner ? ' — ' + c.oneLiner : ''} [难度:${c.difficulty || '?'}] [类型:${CARD_TYPE_LABELS[c.cardType] || c.cardType}]`
+      ).join('\n')
+    : '（暂无卡片，这是该分类的第一张）'
+
+  const topicHintSection = topicHint
+    ? `\n## 指定主题（必须围绕此主题生成）\n- 主题: ${topicHint.title}\n- 简介: ${topicHint.oneLiner}\n\n请专门围绕这个具体方向生成卡片。主题指令优先于"避免重复"规则。`
+    : ''
+
+  const coveredTagsSection = coverage.coveredTags.length > 0
+    ? `\n### 已充分覆盖的主题标签（优先避开）\n${coverage.coveredTags.slice(0, 6).map(t => `- ${t}`).join('\n')}`
+    : ''
+
+  return `你是一个知识科普内容创作专家。请为「万象研究所」知识卡片平台生成一张**指定难度**的知识卡片。
+
+## 目标领域
+- 分类: ${catName} (${category})
+- 描述: ${catDesc}
+${topicHintSection}
+
+${diffInstruction[targetDifficulty]}
+
+## 已有卡片（同难度方向的卡片请避免重复，不同难度的可以深化）
+${existingCardsList}
+${coveredTagsSection}
+
+## 内容结构规范（必须严格遵循以下六步结构）
+
+### 第1步：开头钩子（Hook）
+- 不要直接给定义，先用反直觉问题、日常场景或"你以为…其实…"句式制造兴趣
+
+### 第2步：一句话讲清「它是什么」
+- 极度压缩 + 口语化，追求"第一次听懂"而非学术严谨
+
+### 第3步：生活例子建立直觉
+- 用日常场景让人产生"哦我懂了"的感觉
+
+### 第4步：小解释（控制深度）
+- 只讲"最关键的一层"原理，不展开复杂推导
+
+### 第5步：反常识/误区（记忆点）
+- 指出一个大众常见的误解
+
+### 第6步：现实意义收尾
+- 告诉读者这和他有什么关系
+
+## 输出要求
+请严格按以下 JSON 格式输出，不要包含任何其他文字：
+
+{
+  "id": "${category}-xxx（3位数字，从现有最大号+1开始）",
+  "slug": "英文短横线slug",
+  "title": "中文标题",
+  "oneLiner": "用一句话勾起好奇心（不超过50字）",
+  "category": "${category}",
+  "tags": ["标签1", "标签2", "标签3"],
+  "difficulty": "${targetDifficulty}",
+  "cardType": "concept 或 person 或 event 或 experiment 或 principle",
+  "content": "Markdown格式，严格按照六步结构撰写。用 ## 作为每步的标题：\n## 你有没有想过…\n## 一句话说清楚\n## 生活中的影子\n## 背后的小原理\n## 你可能一直搞错了\n## 所以呢？\n\n总字数${targetDifficulty === 'advanced' ? '600-800字' : '400-600字'}，语言风格：像朋友聊天一样。",
+  "keyData": [
+    {"label": "数据标签", "value": "数据值", "description": "简短说明"}
+  ],
+  "references": [
+    {"id": 1, "title": "参考书目/资料", "author": "作者"}
+  ]
+}
+
+要求：
+1. difficulty 必须填写 "${targetDifficulty}"，这是硬性要求
+2. 严格遵循六步结构，每步都要有实质内容
+3. oneLiner 要像钩子——让人想点进来看
+4. keyData 提供 2-4 个核心数据点
+5. references 提供 1-3 个参考来源
+6. 新卡片必须与已有卡片形成互补`
+}
+
+export function buildProgressivePathPrompt(
+  category: Category,
+  targetDifficulty: Difficulty,
+  existingPaths: string[],
+  existingCards: { id: string; title: string; oneLiner: string; difficulty?: string }[],
+  prerequisiteCardTitles: string[] = [],
+): string {
+  const catMeta = CATEGORIES.find(c => c.id === category)
+  const catName = catMeta?.name || category
+  const catDesc = catMeta?.description || ''
+  const catColor = catMeta?.color || '#FFB3BA'
+
+  const diffLabel: Record<Difficulty, string> = {
+    beginner: '入门（基础概念，零门槛）',
+    intermediate: '进阶（技术原理，需要基础概念前置）',
+    advanced: '专业（实践技能与方法论，需要技术基础前置）',
+  }
+
+  const prerequisiteSection = prerequisiteCardTitles.length > 0
+    ? `\n## 学习者已掌握的前置知识\n${prerequisiteCardTitles.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n\n路径中的卡片内容应建立在这些前置知识之上，不要重复基础内容。`
+    : ''
+
+  return `你是一个知识学习路径设计专家。请为「万象研究所」知识卡片平台生成一条**指定难度等级**的学习路径（技能树）。
+
+## 目标领域
+- 分类: ${catName} (${category})
+- 描述: ${catDesc}
+
+## 目标难度
+- 难度: ${diffLabel[targetDifficulty]}
+- 路径中**所有节点**的难度必须是 "${targetDifficulty}"
+
+## 已有路径标题（请勿重复）
+${existingPaths.length > 0 ? existingPaths.map((t, i) => `${i + 1}. ${t}`).join('\n') : '（暂无路径）'}
+${prerequisiteSection}
+
+## 该分类已有知识卡片（优先复用同难度的卡片）
+${existingCards.length > 0 ? existingCards.map((c, i) => `${i + 1}. [ID: ${c.id}] ${c.title} — ${c.oneLiner} [难度:${c.difficulty || '?'}]`).join('\n') : '（暂无卡片）'}
+
+## 输出要求
+请严格按以下 JSON 格式输出，不要包含任何其他文字：
+
+{
+  "id": "path-${category}-xxx",
+  "slug": "英文短横线slug",
+  "title": "中文标题",
+  "description": "路径描述（50-100字，说明这条路径覆盖什么、适合谁）",
+  "category": "${catName}",
+  "categorySlug": "${category}",
+  "icon": "lucide图标名称",
+  "color": "${catColor}",
+  "difficulty": "${targetDifficulty}",
+  "estimatedTime": "预估学习时间（如 30 分钟）",
+  "nodes": [
+    {
+      "id": "n1（从n1开始递增）",
+      "cardId": "复用已有卡片时填卡片ID，新建卡片时填 null",
+      "cardTitle": "知识概念名称（中文名）",
+      "cardOneLiner": "像钩子一样勾起好奇心的短句（不超过50字）",
+      "cardType": "concept 或 person 或 event 或 experiment 或 principle",
+      "cardDifficulty": "${targetDifficulty}",
+      "cardTags": ["中文标签1", "中文标签2"],
+      "cardContent": "当 cardId 为 null 时必填：Markdown格式，严格按六步科普结构撰写，${targetDifficulty === 'advanced' ? '600-800字' : '400-600字'}。当 cardId 有值时可留空字符串",
+      "cardKeyData": [
+        {"label": "数据标签", "value": "数据值", "description": "简短说明"}
+      ],
+      "cardReferences": [
+        {"id": 1, "title": "参考书目/资料", "author": "作者"}
+      ],
+      "type": "required 或 optional 或 bonus",
+      "position": {"x": 数字, "y": 数字}
+    }
+  ],
+  "edges": [
+    {"from": "n1", "to": "n2", "type": "prerequisite 或 related"}
+  ],
+  "tags": ["中文标签1", "中文标签2"]
+}
+
+要求：
+1. 生成 4-8 个节点，形成有层次的知识树
+2. 节点 position 要合理分布（x: 50-400, y: 40-400），形成从上到下的树形结构
+3. **所有节点的 cardDifficulty 必须是 "${targetDifficulty}"**——这是硬性要求
+4. edges 要体现学习先后关系
+5. 优先复用已有卡片（cardId 设为已有卡片ID），没有对应卡片则新建（cardId 设为 null）
+6. 新建卡片必须提供完整内容
+7. 所有标签使用中文
+8. icon 使用 lucide 图标名称，不要使用 emoji`
 }
 
 export function buildPathPrompt(category: Category, existingPaths: string[], existingCards: {id: string, title: string, oneLiner: string}[]): string {

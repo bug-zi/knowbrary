@@ -54,6 +54,7 @@ const ALL_CATEGORIES = [
   { id: 'logical-fallacies', name: '逻辑谬误', icon: 'lucide:unlink', color: '#889878', description: '识别日常论证中的推理漏洞', sort_order: 37 },
   { id: 'lost-civilizations', name: '失落文明', icon: 'lucide:castle', color: '#A09080', description: '消失的帝国与被遗忘的城市', sort_order: 38 },
   { id: 'materials-science', name: '材料学', icon: 'lucide:atom', color: '#587880', description: '日常物品背后隐藏的材料史诗', sort_order: 39 },
+  { id: 'cybersecurity', name: '网络安全', icon: 'lucide:shield-check', color: '#4A7A8C', description: '从安全意识到专业防护，掌握数字世界的生存技能', sort_order: 40 },
 ];
 
 async function sync() {

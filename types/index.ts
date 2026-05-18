@@ -38,6 +38,7 @@ export type Category =
   | 'logical-fallacies'
   | 'lost-civilizations'
   | 'materials-science'
+  | 'cybersecurity'
 
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced'
 
@@ -78,6 +79,7 @@ export interface ExistingCardSummary {
   oneLiner: string
   tags: string[]
   cardType: CardType
+  difficulty?: Difficulty
 }
 
 export interface InterestProfile {
@@ -136,6 +138,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { id: 'logical-fallacies', name: '逻辑谬误', icon: 'lucide:unlink', color: '#889878', description: '识别日常论证中的推理漏洞', cardCount: 0 },
   { id: 'lost-civilizations', name: '失落文明', icon: 'lucide:castle', color: '#A09080', description: '消失的帝国与被遗忘的城市', cardCount: 0 },
   { id: 'materials-science', name: '材料学', icon: 'lucide:atom', color: '#587880', description: '日常物品背后隐藏的材料史诗', cardCount: 0 },
+  { id: 'cybersecurity', name: '网络安全', icon: 'lucide:shield-check', color: '#4A7A8C', description: '从安全意识到专业防护，掌握数字世界的生存技能', cardCount: 0 },
 ]
 
 export const DIFFICULTY_LABELS: Record<Difficulty, { label: string; icon: string }> = {
