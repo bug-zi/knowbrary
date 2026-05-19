@@ -132,7 +132,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { id: 'mythology', name: '神话与民俗', icon: 'lucide:scroll', color: '#907868', description: '探索世界神话、传说与民俗文化', cardCount: 0 },
   { id: 'criminology', name: '犯罪学与法医', icon: 'lucide:fingerprint', color: '#687888', description: '犯罪心理与法医鉴定的科学', cardCount: 0 },
   { id: 'paradoxes', name: '悖论与思维实验', icon: 'lucide:infinity', color: '#8868A0', description: '烧脑悖论与颠覆常识的思维实验', cardCount: 0 },
-  { id: 'human-limits', name: '人类极限', icon: 'lucide:flame', color: '#A86848', description: '探索人体极限与超凡能力的科学', cardCount: 0 },
+  { id: 'human-limits', name: '人类极限', icon: 'lucide:flame', color: '#A86848', description: '从吉尼斯纪录到生理极限，揭秘人类的终极边界', cardCount: 0 },
   { id: 'unsolved-mysteries', name: '未解之谜', icon: 'lucide:help-circle', color: '#7068A8', description: '科学尚未破解的终极谜题', cardCount: 0 },
   { id: 'humor', name: '幽默学', icon: 'lucide:laugh', color: '#B8A060', description: '认真分析笑话为什么好笑的学问', cardCount: 0 },
   { id: 'logical-fallacies', name: '逻辑谬误', icon: 'lucide:unlink', color: '#889878', description: '识别日常论证中的推理漏洞', cardCount: 0 },

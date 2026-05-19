@@ -2,6 +2,31 @@ import { CATEGORIES, CARD_TYPE_LABELS } from '~/types'
 import type { Category, CardType, Difficulty, ExistingCardSummary } from '~/types'
 import type { TavilyResult } from '~/types/fact-check'
 
+/** Category-specific content guidance injected into AI prompts */
+const CATEGORY_GUIDES: Partial<Record<Category, string>> = {
+  'human-limits': `## 该领域的内容方向（必须遵循）
+"人类极限"聚焦于**真实、可验证的人类历史纪录和生理科学极限**，而不是超能力或玄学。内容必须来自以下两个方向之一：
+
+### 方向A：人类历史纪录（吉尼斯级别）
+- 真实存在的世界纪录及其背后的科学解释（如：最长时间憋气、最高无辅助跳跃、最长不眠记录）
+- 纪录保持者的训练方法或生理特质
+- 纪录背后的数据——用了多久、突破了多少、比普通人强几倍
+
+### 方向B：生理极限科普（理论值 + 实验数据）
+- 普通人的生理极限是多少（如：人能承受的最高/最低温度、最快反应速度、最大握力、憋气极限、失血多少会昏迷）
+- 极限的生理学原因——为什么不能再多了？
+- 实验室数据或医学研究支撑
+
+### 禁止内容
+- 不要生成超能力、心灵感应、神秘主义等未经科学验证的内容
+- 不要写成"如何突破极限"的训练指南
+- keyData 中必须有具体的数字（纪录数值、生理参数等），不能是模糊描述`,
+}
+
+function getCategoryGuide(category: Category): string {
+  return CATEGORY_GUIDES[category] || ''
+}
+
 export function buildQuizPrompt(
   cards: { title: string; content: string; category: string; oneLiner: string }[],
   difficulty: string
@@ -125,6 +150,7 @@ export function buildCardPrompt(category: Category, existingCards: ExistingCardS
 - 分类: ${catName} (${category})
 - 描述: ${catDesc}
 ${topicHintSection}
+${getCategoryGuide(category)}
 ## 已有卡片及覆盖情况
 ${existingCardsList}
 ${coveredTagsSection}
@@ -242,6 +268,7 @@ export function buildProgressiveCardPrompt(
 - 分类: ${catName} (${category})
 - 描述: ${catDesc}
 ${topicHintSection}
+${getCategoryGuide(category)}
 
 ${diffInstruction[targetDifficulty]}
 
