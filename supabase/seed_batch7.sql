@@ -10,7 +10,7 @@ INSERT INTO categories (id, name, icon, color, description, sort_order) VALUES
 ('paradoxes', '悖论与思维实验', 'lucide:infinity', '#8868A0', '烧脑悖论与颠覆常识的思维实验', 34),
 ('human-limits', '人类极限', 'lucide:flame', '#A86848', '从吉尼斯纪录到生理极限，揭秘人类的终极边界', 35),
 ('unsolved-mysteries', '未解之谜', 'lucide:help-circle', '#7068A8', '科学尚未破解的终极谜题', 36),
-('humor', '幽默学', 'lucide:laugh', '#B8A060', '认真分析笑话为什么好笑的学问', 37),
+('humor', '幽默学', 'lucide:laugh', '#B8A060', '用科学拆解幽默机制——为什么好笑、怎么好笑、幽默的社会密码', 37),
 ('logical-fallacies', '逻辑谬误', 'lucide:unlink', '#889878', '识别日常论证中的推理漏洞', 38),
 ('lost-civilizations', '失落文明', 'lucide:castle', '#A09080', '消失的帝国与被遗忘的城市', 39),
 ('materials-science', '材料学', 'lucide:atom', '#587880', '日常物品背后隐藏的材料史诗', 40)

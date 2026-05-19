@@ -50,7 +50,7 @@ const ALL_CATEGORIES = [
   { id: 'paradoxes', name: '悖论与思维实验', icon: 'lucide:infinity', color: '#8868A0', description: '烧脑悖论与颠覆常识的思维实验', sort_order: 33 },
   { id: 'human-limits', name: '人类极限', icon: 'lucide:flame', color: '#A86848', description: '从吉尼斯纪录到生理极限，揭秘人类的终极边界', sort_order: 34 },
   { id: 'unsolved-mysteries', name: '未解之谜', icon: 'lucide:help-circle', color: '#7068A8', description: '科学尚未破解的终极谜题', sort_order: 35 },
-  { id: 'humor', name: '幽默学', icon: 'lucide:laugh', color: '#B8A060', description: '认真分析笑话为什么好笑的学问', sort_order: 36 },
+  { id: 'humor', name: '幽默学', icon: 'lucide:laugh', color: '#B8A060', description: '用科学拆解幽默机制——为什么好笑、怎么好笑、幽默的社会密码', sort_order: 36 },
   { id: 'logical-fallacies', name: '逻辑谬误', icon: 'lucide:unlink', color: '#889878', description: '识别日常论证中的推理漏洞', sort_order: 37 },
   { id: 'lost-civilizations', name: '失落文明', icon: 'lucide:castle', color: '#A09080', description: '消失的帝国与被遗忘的城市', sort_order: 38 },
   { id: 'materials-science', name: '材料学', icon: 'lucide:atom', color: '#587880', description: '日常物品背后隐藏的材料史诗', sort_order: 39 },
